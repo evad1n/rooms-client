@@ -1,0 +1,26 @@
+[v-cloak]{
+    display: none;
+}
+
+#board{
+    width: 500px;
+    height: 500px;
+    background: black;
+    margin: 0 auto;
+    margin-bottom: 10px;
+}
+
+#character{
+    background-color: red;
+    position: relative;
+    width: 10px;
+    height: 10px;
+    top: 250px;
+    left: 250px;
+}
+
+#game-messages{
+    position: absolute;
+    bottom: 0;
+    right: 50px;
+}
