@@ -40,12 +40,12 @@
                     <v-flex xs6>
                         <v-card elevation="18">
                             <v-card-title class="display-1 justify-center">Messaging</v-card-title>
+                            <v-card-text v-for="message in messages">
+                                {{message}}
+                            </v-card-text>
                             <v-card-text>
                                 <v-text-field label="start typing" v-model="newMessage" outline color="grey">
                                 </v-text-field>
-                            </v-card-text>
-                            <v-card-text>
-                                <p></p>
                             </v-card-text>
                             <v-card-actions>
                                 <v-btn block @click="send()">send</v-btn>

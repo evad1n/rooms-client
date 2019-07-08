@@ -11,7 +11,12 @@ var app = new Vue({
             "test"
         ],
         drawer: false,
-        newMessage: ""
+        newMessage: "",
+        messages: [
+            "hi",
+            "hi",
+            "hi"
+        ]
     },
 
     created: function () {
