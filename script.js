@@ -1,4 +1,4 @@
-const url = 'https://collector-blog-will.herokuapp.com'
+const url = 'https://server-rooms.herokuapp.com'
 //const url = 'http://localhost:3000'
 
 var app = new Vue({
@@ -12,48 +12,34 @@ var app = new Vue({
         ],
         drawer: false,
         newMessage: "",
-        messages: [
-            "hi",
-            "hi",
-            "hi"
-        ]
+        messageHistory: []
     },
 
     created: function () {
-
+        var x = 0
+        x = setInterval(() => {
+            x++
+            this.update()
+        }, 1000);
     },
 
     methods: {
         update: function () {
-            fetch(`${url}/posts`).then(function (res) {
+            fetch(`${url}/messaging`).then(function (res) {
                 res.json().then(function (data) {
-                    app.posts = data.posts;
+                    app.messageHistory = data.history;
                 });
             });
         },
         send: function () {
-            var new_post = {
-                title: this.new_title,
-                author: this.new_author,
-                category: this.new_category,
-                date: new Date(),
-                image: this.new_image,
-                text: this.new_text,
-            };
-            fetch(`${url}/posts`, {
+            fetch(`${url}/messaging`, {
                 method: "POST",
                 headers: {
                     "Content-type": "application/json"
                 },
-                body: JSON.stringify(new_post)
+                body: JSON.stringify({message: app.newMessage})
             }).then(function () {
-                app.new_title = "";
-                app.new_author = "";
-                app.category = "all";
-                app.new_image = "";
-                app.new_text = "";
-                app.page = "blog";
-                app.getPosts();
+                app.update()
             });
         },
     },
