@@ -12,14 +12,14 @@
 </head>
 
 <div id="app" v-cloak>
-    <v-app>
+    <v-app dark>
         <v-content>
             <v-toolbar fixed app>
                 <v-toolbar-title>ROOMS</v-toolbar-title>
                 <v-spacer></v-spacer>
                 <v-toolbar-items>
-                    <v-btn flat v-on:click="page = 'messages'">messages</v-btn>
-                    <v-btn flat v-on:click="page = 'test'">test</v-btn>
+                    <v-btn flat v-on:click="goToMessages()">messages</v-btn>
+                    <v-btn flat v-on:click="goToTest()">test</v-btn>
                 </v-toolbar-items>
             </v-toolbar>
 
@@ -33,11 +33,12 @@
                                 {{message}}
                             </v-card-text>
                             <v-card-text>
-                                <v-text-field label="start typing" v-model="newMessage" outline color="grey" @keyup.enter="send()">
+                                <v-text-field label="start typing" v-model="newMessage" outline color="grey"
+                                    @keyup.enter="sendMessage()">
                                 </v-text-field>
                             </v-card-text>
                             <v-card-actions>
-                                <v-btn block @click="send()">send</v-btn>
+                                <v-btn block @click="sendMessage()">send</v-btn>
                             </v-card-actions>
                         </v-card>
                     </v-flex>
@@ -47,17 +48,25 @@
 
             <v-container v-if="page == 'test'">
                 <v-layout>
-                    <v-flex xs2></v-flex>
+                    <v-flex xs2>
+                        <v-card elevation="18">
+                            <v-card-title class="subheading justify-center">PICK YOUR COLOR</v-card-title>
+                            <div id="color-picker" v-bind:style="{ backgroundColor: 'rgb(' + color.r + ',' + color.g + ',' + color.b + ')' }"></div>
+                            <v-slider v-model="color.r" :max="255" :min="0" :step="1"></v-slider>
+                            <v-slider v-model="color.g" :max="255" :min="0" :step="1"></v-slider>
+                            <v-slider v-model="color.b" :max="255" :min="0" :step="1"></v-slider>
+                            <v-btn block @click="updateColor()">Update Color</v-btn>
+                        </v-card>
+                    </v-flex>
                     <v-flex xs8>
                         <v-card elevation="18">
                             <v-card-title class="display-1 justify-center">TESTING</v-card-title>
                             <div id="board">
-                                <div v-bind:style="{ top: position.y + 'px', left: position.x + 'px' }" id="character"></div>
+                                <div v-for="character in characters"
+                                    v-bind:style="{ top: character.position.y + 'px', left: character.position.x + 'px', backgroundColor: 'rgb(' + color.r + ',' + color.g + ',' + color.b + ')' }"
+                                    class="character"></div>
                             </div>
-                            <v-card-actions>
-                                <v-btn block @click="moveLeft()">move left</v-btn>
-                                <v-btn block @click="moveRight()">move right</v-btn>
-                            </v-card-actions>
+                            <v-card-title class="headline justify-center">Use WASD to move</v-card-title>
                         </v-card>
                     </v-flex>
                     <v-flex xl6 id="game-messages">
@@ -67,11 +76,12 @@
                                 {{message}}
                             </v-card-text>
                             <v-card-text>
-                                <v-text-field label="start typing" v-model="newMessage" outline color="grey" @keyup.enter="send()">
+                                <v-text-field label="start typing" v-model="newMessage" outline color="grey"
+                                    @keyup.enter="sendGameMessage()">
                                 </v-text-field>
                             </v-card-text>
                             <v-card-actions>
-                                <v-btn block @click="send()">send</v-btn>
+                                <v-btn block @click="sendGameMessage()">send</v-btn>
                             </v-card-actions>
                         </v-card>
                     </v-flex>

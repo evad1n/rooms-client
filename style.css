@@ -10,7 +10,7 @@
     margin-bottom: 10px;
 }
 
-#character{
+.character{
     background-color: red;
     position: relative;
     width: 10px;
@@ -23,4 +23,9 @@
     position: absolute;
     bottom: 0;
     right: 50px;
+}
+
+#color-picker{
+    width: 200px;
+    height: 200px;
 }
