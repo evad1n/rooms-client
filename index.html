@@ -19,7 +19,8 @@
                 <v-spacer></v-spacer>
                 <v-toolbar-items>
                     <v-btn flat v-on:click="goToMessages()">messages</v-btn>
-                    <v-btn flat v-on:click="goToTest()">test</v-btn>
+                    <v-btn flat v-on:click="goToTest()">game</v-btn>
+                    <v-btn flat v-on:click="page = 'components'">component testing</v-btn>
                 </v-toolbar-items>
             </v-toolbar>
 
@@ -27,20 +28,7 @@
                 <v-layout>
                     <v-flex xs3></v-flex>
                     <v-flex xs6>
-                        <v-card elevation="18">
-                            <v-card-title class="display-1 justify-center">Messaging</v-card-title>
-                            <v-card-text v-for="message in messageHistory">
-                                {{message}}
-                            </v-card-text>
-                            <v-card-text>
-                                <v-text-field label="start typing" v-model="newMessage" outline color="grey"
-                                    @keyup.enter="sendMessage()">
-                                </v-text-field>
-                            </v-card-text>
-                            <v-card-actions>
-                                <v-btn block @click="sendMessage()">send</v-btn>
-                            </v-card-actions>
-                        </v-card>
+                        <Messaging v-bind:route="'messaging/main'"></Messaging>
                     </v-flex>
                     <v-flex xs3></v-flex>
                 </v-layout>
@@ -86,6 +74,18 @@
                         </v-card>
                     </v-flex>
                 </v-layout>
+            </v-container>
+
+            <v-container v-if="page == 'components'">
+                <v-layout>
+                    <v-flex xs3></v-flex>
+                    <v-flex xs6>
+                        <Messaging v-bind:route="'messaging/main'"></Messaging>
+                        <Messaging v-bind:route="'messaging/side'"></Messaging>
+                    </v-flex>
+                    <v-flex xs3></v-flex>
+                </v-layout>
+            </v-container>
 
         </v-content>
     </v-app>
