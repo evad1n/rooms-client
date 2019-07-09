@@ -1,8 +1,16 @@
+:root {
+    --header-height: 60px;
+}
+
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
     font-family: sans-serif;
+}
+
+[v-cloak] {
+    display: none;
 }
 
 .container {
@@ -11,13 +19,13 @@
 }
 
 header {
-    height: 40px;
-
+    height: var(--header-height);
+    background-image: linear-gradient(#219bff,#3a9ef0)
 }
 
 header h2 {
-    height: 40px;
-    line-height: 40px;
+    height: var(--header-height);
+    line-height: var(--header-height);
     text-transform: uppercase;
     display: inline-block;
     float: left;
@@ -28,11 +36,14 @@ nav{
 }
 
 nav li {
-    height: 40px;
-    width: 100px;
+    height: var(--header-height);
+    width: 120px;
     text-align: center;
-    line-height: 40px;
+    line-height: var(--header-height);
     text-transform: uppercase;
     display: inline-block;
-    background-color: steelblue;
+}
+
+nav li:hover {
+    background-color: red;
 }

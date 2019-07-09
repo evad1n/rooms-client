@@ -17,15 +17,15 @@ var Vue = new Vue({
             //SERVER should only send what is relevant to player's game
             {
                 username: "Dave",
-                playing: "asteroids"
+                playing: "asteroids",
             },
             {
                 username: "Bob",
-                playing: "pictionary"
+                playing: "pictionary",
             },
             {
                 username: "John",
-                playing: "go"
+                playing: "go",
             }
         ],
 
@@ -38,7 +38,7 @@ var Vue = new Vue({
                     alive: true,
                     location: {
                         x: 250,
-                        y: 250
+                        y: 250,
                     },
                     rotation: 45,
                 }
@@ -46,7 +46,7 @@ var Vue = new Vue({
             chat: [
                 {
                     sender: "Dave",
-                    message: "Hello, everybody!"
+                    message: "Hello, everybody!",
                 }
             ]
         },
@@ -57,13 +57,13 @@ var Vue = new Vue({
                 {
                     username: "Bob",
                     points: 4,
-                    players_turn: false
+                    players_turn: false,
                 }
             ],
             chat: [
                 {
                     sender: "Bob",
-                    message: "I am winning!"
+                    message: "I am winning!",
                 }
             ]
         },
@@ -82,10 +82,10 @@ var Vue = new Vue({
             chat: [
                 {
                     sender: "John",
-                    message: "How do you play this?"
+                    message: "How do you play this?",
                 }
             ]
-        }
+        },
     },
 
     methods: {
