@@ -2,6 +2,10 @@
     display: none;
 }
 
+#login {
+    margin-top: calc(50vh - 250px);
+}
+
 #board{
     width: 500px;
     height: 500px;

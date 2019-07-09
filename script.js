@@ -1,5 +1,5 @@
-const url = 'https://server-rooms.herokuapp.com'
-//const url = 'http://localhost:3000'
+//const url = 'https://server-rooms.herokuapp.com'
+const url = 'http://localhost:3000'
 
 const UPDATE_INTERVAL = 1000
 
@@ -19,7 +19,7 @@ var Messaging = {
             this.newMessage = ""
         },
         getMessages: function () {
-            app.getMessages(this.route, this.history, this.updateHistory)
+            app.getMessages(this.route, this.updateHistory)
         },
         updateHistory: function (newHistory) {
             this.history = newHistory
@@ -32,6 +32,7 @@ var Messaging = {
     },
     beforeDestroy() {
         clearInterval(this.timer)
+        clearInterval(app.interval)
     },
     template: `<v-card elevation="18">
                     <v-card-title class="display-1 justify-center">Messaging</v-card-title>
@@ -51,23 +52,22 @@ var Messaging = {
 
 var app = new Vue({
     el: "#app",
-    components: { 
-        'messaging': Messaging 
+    components: {
+        'messaging': Messaging
     },
 
     data: {
-        page: "test",
+        page: "login",
         rooms: [
-            "messages",
-            "test"
+            "messaging",
+            "test",
+            "components"
         ],
-        interval: 0,
-        newMessage: "",
-        messageHistory: [],
-        gameMessageHistory: [],
-        playerID: 0,
-        username: "jimmy",
+        welcome: true,
+        username: "",
+        badName: false,
         characters: [],
+        interval: "",
         playerColor: "red",
         color: {
             "r": 0,
@@ -97,7 +97,7 @@ var app = new Vue({
 
     methods: {
         onLeave: function () {
-            fetch(`${url}/game/${app.playerID}`, {
+            fetch(`${url}/${app.username}`, {
                 method: "DELETE",
             })
             return null
@@ -115,25 +115,35 @@ var app = new Vue({
                 }
             }
         },
-        goToMessages: function () {
-            this.page = "messages"
-        },
-        goToTest: function () {
-            this.page = "test"
-            clearInterval(this.interval)
-            this.interval = setInterval(() => {
-                this.updateGame()
-            }, UPDATE_INTERVAL);
-        },
-        updateGame: function () {
-            fetch(`${url}/game`).then(function (res) {
-                res.json().then(function (data) {
-                    app.gameMessageHistory = data.history;
-                    app.characters = data.characters;
+        checkUsername: function () {
+            if (this.username != "") {
+                //check for valid username
+                fetch(`${url}/users`).then(function (res) {
+                    res.json().then(function (data) {
+                        app.badName = false
+                        for (let index = 0; index < data.users.length; index++) {
+                            if (app.username == data.users[index]) {
+                                app.badName = true
+                            }
+                        }
+
+                        if (!app.badName) {
+                            //post valid name
+                            fetch(`${url}/users`, {
+                                method: "POST",
+                                headers: {
+                                    "Content-type": "application/json"
+                                },
+                                body: JSON.stringify({ username: app.username })
+                            }).then(function () {
+                                app.page = "messaging"
+                            });
+                        }
+                    });
                 });
-            });
+            }
         },
-        getMessages: function (route, history, callback) {
+        getMessages: function (route, callback) {
             fetch(`${url}/${route}`).then(function (res) {
                 res.json().then(function (data) {
                     callback(data.history)
@@ -154,22 +164,21 @@ var app = new Vue({
                 });
             }
         },
-        sendGameMessage: function () {
-            if (this.newMessage != "") {
-                fetch(`${url}/messages/${app.playerID}`, {
-                    method: "POST",
-                    headers: {
-                        "Content-type": "application/json"
-                    },
-                    body: JSON.stringify({ message: app.newMessage })
-                }).then(function () {
-                    app.newMessage = ""
-                    app.updateGame()
+        goToTest: function () {
+            this.page = "test"
+            this.interval = setInterval(() => {
+                this.updateGame()
+            }, UPDATE_INTERVAL);
+        },
+        updateGame: function () {
+            fetch(`${url}/game`).then(function (res) {
+                res.json().then(function (data) {
+                    app.characters = data.characters;
                 });
-            }
+            });
         },
         gameMove: function (move) {
-            fetch(`${url}/game/${app.playerID}`, {
+            fetch(`${url}/game/${username}`, {
                 method: "POST",
                 headers: {
                     "Content-type": "application/json"

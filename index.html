@@ -14,17 +14,37 @@
 <div id="app" v-cloak>
     <v-app dark>
         <v-content>
-            <v-toolbar fixed app>
+            <v-toolbar fixed app v-if="page != 'login'">
                 <v-toolbar-title>ROOMS</v-toolbar-title>
                 <v-spacer></v-spacer>
                 <v-toolbar-items>
-                    <v-btn flat v-on:click="goToMessages()">messages</v-btn>
-                    <v-btn flat v-on:click="goToTest()">game</v-btn>
-                    <v-btn flat v-on:click="page = 'components'">component testing</v-btn>
+                    <v-btn flat v-for="room in rooms" v-on:click="page = room; welcome = false">{{room}}</v-btn>
                 </v-toolbar-items>
             </v-toolbar>
+            <v-card-title class="display-1 justify-center" v-if="page != 'login' && welcome">Welcome {{username}}!</v-card-title>
 
-            <v-container v-if="page == 'messages'">
+            <v-container v-if="page == 'login'">
+                <v-layout>
+                    <v-flex xs3></v-flex>
+                    <v-flex xs6>
+                        <v-card id="login" elevation="18">
+                            <v-card-title class="display-1 justify-center">Enter a Username</v-card-title>
+                            <v-card-text>
+                                <v-text-field label="name" v-model="username" outline color="grey"
+                                    @keyup.enter="checkUsername()">
+                                </v-text-field>
+                            </v-card-text>
+                            <v-card-actions>
+                                <v-btn block @click="checkUsername()">enter</v-btn>
+                            </v-card-actions>
+                            <v-card-text v-if="badName" class="subheading text-xs-center red">That username is already taken</v-card-text>
+                        </v-card>
+                    </v-flex>
+                    <v-flex xs3></v-flex>
+                </v-layout>
+            </v-container>
+
+            <v-container v-if="page == 'messaging'">
                 <v-layout>
                     <v-flex xs3></v-flex>
                     <v-flex xs6>
@@ -58,20 +78,7 @@
                         </v-card>
                     </v-flex>
                     <v-flex xl6 id="game-messages">
-                        <v-card elevation="18">
-                            <v-card-title class="display-1 justify-center">Messaging</v-card-title>
-                            <v-card-text v-for="message in messageHistory">
-                                {{message}}
-                            </v-card-text>
-                            <v-card-text>
-                                <v-text-field label="start typing" v-model="newMessage" outline color="grey"
-                                    @keyup.enter="sendGameMessage()">
-                                </v-text-field>
-                            </v-card-text>
-                            <v-card-actions>
-                                <v-btn block @click="sendGameMessage()">send</v-btn>
-                            </v-card-actions>
-                        </v-card>
+                            <Messaging v-bind:route="'game/messaging'"></Messaging>
                     </v-flex>
                 </v-layout>
             </v-container>
