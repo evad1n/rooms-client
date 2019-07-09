@@ -1,5 +1,5 @@
-const url = 'https://server-rooms.herokuapp.com'
-//const url = 'http://localhost:3000'
+//const url = 'https://server-rooms.herokuapp.com'
+const url = 'http://localhost:3000'
 
 const UPDATE_INTERVAL = 1000
 
@@ -14,8 +14,7 @@ var Messaging = {
     },
     methods: {
         sendMessage: function () {
-            //this.history.push({ 'user': app.username, 'text': this.newMessage })
-            app.sendMessage(this.route, { "user": app.username, "text": this.newMessage }, this.history)
+            app.sendMessage(this.route, { "user": app.username, "text": this.newMessage }, this.updateHistory)
             this.newMessage = ""
         },
         getMessages: function () {
@@ -70,28 +69,13 @@ var app = new Vue({
         interval: "",
         playerColor: "red",
         color: {
-            "r": 0,
+            "r": 255,
             "g": 0,
             "b": 0
         }
     },
 
     created: function () {
-        fetch(`${url}/game/login`, {
-            method: "POST",
-            headers: {
-                "Content-type": "application/json"
-            },
-        }).then(function (res) {
-            res.json().then(function (data) {
-                app.playerID = data.id
-            });
-        });
-
-        this.interval = setInterval(() => {
-            this.updateGame()
-        }, UPDATE_INTERVAL);
-
         window.addEventListener("keyup", this.keyEvents);
     },
 
@@ -146,11 +130,11 @@ var app = new Vue({
         getMessages: function (route, callback) {
             fetch(`${url}/${route}`).then(function (res) {
                 res.json().then(function (data) {
-                    callback(data.history)
+                    callback && callback(data.history)
                 });
             });
         },
-        sendMessage: function (route, message, history) {
+        sendMessage: function (route, message, callback) {
             if (message.text != "") {
                 fetch(`${url}/${route}`, {
                     method: "POST",
@@ -159,16 +143,9 @@ var app = new Vue({
                     },
                     body: JSON.stringify({ message: message })
                 }).then(function () {
-                    app.newMessage = ""
-                    app.getMessages(route, history)
+                    callback && app.getMessages(route, callback)
                 });
             }
-        },
-        goToTest: function () {
-            this.page = "test"
-            this.interval = setInterval(() => {
-                this.updateGame()
-            }, UPDATE_INTERVAL);
         },
         updateGame: function () {
             fetch(`${url}/game`).then(function (res) {
@@ -178,18 +155,18 @@ var app = new Vue({
             });
         },
         gameMove: function (move) {
-            fetch(`${url}/game/${username}`, {
+            fetch(`${url}/game`, {
                 method: "POST",
                 headers: {
                     "Content-type": "application/json"
                 },
-                body: JSON.stringify({ move: move })
+                body: JSON.stringify({ move: move, user: app.username })
             }).then(function () {
                 app.updateGame()
             });
         },
-        updateColor: function () {
-            fetch(`${url}/game/color/${app.playerID}`, {
+        createCharacter: function () {
+            fetch(`${url}/game/color/${app.username}`, {
                 method: "POST",
                 headers: {
                     "Content-type": "application/json"
@@ -198,6 +175,22 @@ var app = new Vue({
             }).then(function () {
                 app.updateGame()
             });
+
+                        //set game timer
+                        this.interval = setInterval(() => {
+                            this.updateGame()
+                        }, UPDATE_INTERVAL);
+            
+                        //create character for user
+                        fetch(`${url}/game/login`, {
+                            method: "POST",
+                            headers: {
+                                "Content-type": "application/json"
+                            },
+                            body: JSON.stringify({ username: app.username })
+                        }).then(function () {
+                            app.updateGame()
+                        });
         }
     },
 
