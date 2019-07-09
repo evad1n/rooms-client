@@ -14,12 +14,15 @@ var Messaging = {
     },
     methods: {
         sendMessage: function () {
-            this.history.push({ 'user': app.username, 'text': this.newMessage })
+            //this.history.push({ 'user': app.username, 'text': this.newMessage })
             app.sendMessage(this.route, { "user": app.username, "text": this.newMessage }, this.history)
             this.newMessage = ""
         },
         getMessages: function () {
-            app.getMessages(this.route, this.history)
+            app.getMessages(this.route, this.history, this.updateHistory)
+        },
+        updateHistory: function (newHistory) {
+            this.history = newHistory
         }
     },
     mounted() {
@@ -130,10 +133,10 @@ var app = new Vue({
                 });
             });
         },
-        getMessages: function (route, history) {
+        getMessages: function (route, history, callback) {
             fetch(`${url}/${route}`).then(function (res) {
                 res.json().then(function (data) {
-                    history = data.history;
+                    callback(data.history)
                 });
             });
         },
