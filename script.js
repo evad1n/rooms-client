@@ -3,8 +3,54 @@ const url = 'https://server-rooms.herokuapp.com'
 
 const UPDATE_INTERVAL = 1000
 
+var Messaging = {
+    props: ['route'],
+    data: function () {
+        return {
+            newMessage: "",
+            history: [],
+            timer: "abc"
+        }
+    },
+    methods: {
+        sendMessage: function () {
+            this.history.push({ 'user': app.username, 'text': this.newMessage })
+            app.sendMessage(this.route, { "user": app.username, "text": this.newMessage }, this.history)
+            this.newMessage = ""
+        },
+        getMessages: function () {
+            app.getMessages(this.route, this.history)
+        }
+    },
+    mounted() {
+        this.timer = setInterval(() => {
+            this.getMessages()
+        }, UPDATE_INTERVAL);
+    },
+    beforeDestroy() {
+        clearInterval(this.timer)
+    },
+    template: `<v-card elevation="18">
+                    <v-card-title class="display-1 justify-center">Messaging</v-card-title>
+                    <v-card-text v-for="message in this.history">
+                        {{message.user}}: {{message.text}}
+                    </v-card-text>
+                    <v-card-text>
+                        <v-text-field label="start typing" v-model="newMessage" outline color="grey"
+                            @keyup.enter="sendMessage()">
+                        </v-text-field>
+                    </v-card-text>
+                    <v-card-actions>
+                        <v-btn block @click="sendMessage()">send</v-btn>
+                    </v-card-actions>
+                </v-card>`
+}
+
 var app = new Vue({
     el: "#app",
+    components: { 
+        'messaging': Messaging 
+    },
 
     data: {
         page: "test",
@@ -17,6 +63,7 @@ var app = new Vue({
         messageHistory: [],
         gameMessageHistory: [],
         playerID: 0,
+        username: "jimmy",
         characters: [],
         playerColor: "red",
         color: {
@@ -69,7 +116,7 @@ var app = new Vue({
             this.page = "messages"
             clearInterval(this.interval)
             this.interval = setInterval(() => {
-                this.getMessages()
+                this.getMessages("messaging/main", this.messageHistory)
             }, UPDATE_INTERVAL);
         },
         goToTest: function () {
@@ -79,13 +126,6 @@ var app = new Vue({
                 this.updateGame()
             }, UPDATE_INTERVAL);
         },
-        getMessages: function () {
-            fetch(`${url}/messaging`).then(function (res) {
-                res.json().then(function (data) {
-                    app.messageHistory = data.history;
-                });
-            });
-        },
         updateGame: function () {
             fetch(`${url}/game`).then(function (res) {
                 res.json().then(function (data) {
@@ -94,17 +134,25 @@ var app = new Vue({
                 });
             });
         },
-        sendMessage: function () {
-            if (this.newMessage != "") {
-                fetch(`${url}/messaging`, {
+        getMessages: function (route, history) {
+            fetch(`${url}/${route}`).then(function (res) {
+                res.json().then(function (data) {
+                    history = data.history;
+                });
+            });
+        },
+        sendMessage: function (route, message, history) {
+            console.log(route, message, history)
+            if (message.text != "") {
+                fetch(`${url}/${route}`, {
                     method: "POST",
                     headers: {
                         "Content-type": "application/json"
                     },
-                    body: JSON.stringify({ message: app.newMessage })
+                    body: JSON.stringify({ message: app.newMessage, history: history })
                 }).then(function () {
                     app.newMessage = ""
-                    app.getMessages()
+                    app.getMessages(route, history)
                 });
             }
         },
