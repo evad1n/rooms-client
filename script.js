@@ -114,10 +114,6 @@ var app = new Vue({
         },
         goToMessages: function () {
             this.page = "messages"
-            clearInterval(this.interval)
-            this.interval = setInterval(() => {
-                this.getMessages("messaging/main", this.messageHistory)
-            }, UPDATE_INTERVAL);
         },
         goToTest: function () {
             this.page = "test"
@@ -142,14 +138,13 @@ var app = new Vue({
             });
         },
         sendMessage: function (route, message, history) {
-            console.log(route, message, history)
             if (message.text != "") {
                 fetch(`${url}/${route}`, {
                     method: "POST",
                     headers: {
                         "Content-type": "application/json"
                     },
-                    body: JSON.stringify({ message: app.newMessage, history: history })
+                    body: JSON.stringify({ message: message })
                 }).then(function () {
                     app.newMessage = ""
                     app.getMessages(route, history)
