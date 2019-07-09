@@ -1,0 +1,38 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: sans-serif;
+}
+
+.container {
+    width: 960px;
+    margin: 0 auto;
+}
+
+header {
+    height: 40px;
+
+}
+
+header h2 {
+    height: 40px;
+    line-height: 40px;
+    text-transform: uppercase;
+    display: inline-block;
+    float: left;
+}
+
+nav{
+    float: right;
+}
+
+nav li {
+    height: 40px;
+    width: 100px;
+    text-align: center;
+    line-height: 40px;
+    text-transform: uppercase;
+    display: inline-block;
+    background-color: steelblue;
+}
