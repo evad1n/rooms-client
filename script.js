@@ -9,29 +9,33 @@ var Messaging = {
         return {
             newMessage: "",
             history: [],
-            timer: "abc"
+            users: [],
+            timer: "",
+            bool: true
         }
     },
     methods: {
         sendMessage: function () {
-            app.sendMessage(this.route, { "user": app.username, "text": this.newMessage }, this.updateHistory)
+            app.sendMessage(this.route, { "user": app.username, "text": this.newMessage }, this.updateData)
             this.newMessage = ""
         },
         getMessages: function () {
-            app.getMessages(this.route, this.updateHistory)
+            //console.log("mounted getMessage ", this.route)
+            app.getMessages(this.route, this.updateData)
         },
-        updateHistory: function (newHistory) {
+        updateData: function (newHistory, newUsers) {
             this.history = newHistory
+            this.users = newUsers
         }
     },
     mounted() {
+        this.getMessages()
         this.timer = setInterval(() => {
             this.getMessages()
         }, UPDATE_INTERVAL);
     },
     beforeDestroy() {
         clearInterval(this.timer)
-        clearInterval(app.interval)
     },
     template: `<v-card elevation="18">
                     <v-card-title class="display-1 justify-center">Messaging</v-card-title>
@@ -42,6 +46,7 @@ var Messaging = {
                         <v-text-field label="start typing" v-model="newMessage" outline color="grey"
                             @keyup.enter="sendMessage()">
                         </v-text-field>
+                        Current users:<span v-for="user in this.users"> {{user}}<span v-if="this.bool">,</span></span>
                     </v-card-text>
                     <v-card-actions>
                         <v-btn block @click="sendMessage()">send</v-btn>
@@ -58,14 +63,16 @@ var app = new Vue({
     data: {
         page: "login",
         rooms: [
-            "messaging",
-            "test",
-            "components"
+            "globalMessaging",
+            "otherMessaging",
+            "game"
         ],
         welcome: true,
+        testUsername: "",
         username: "",
         badName: false,
         characters: [],
+        characterCreated: false,
         interval: "",
         playerColor: "red",
         color: {
@@ -80,14 +87,31 @@ var app = new Vue({
     },
 
     methods: {
-        onLeave: function () {
-            fetch(`${url}/${app.username}`, {
-                method: "DELETE",
-            })
-            return null
+        onLeave: function (e) {
+            e.preventDefault();
+            
+            if (app.username != "") {
+                //remove user from last room
+                fetch(`${url}/${app.page}/users`, {
+                    method: "PUT",
+                    headers: {
+                        "Content-type": "application/json"
+                    },
+                    body: JSON.stringify({ user: app.username })
+                })
+
+                //remove user from global users
+                fetch(`${url}/users`, {
+                    method: "DELETE",
+                    headers: {
+                        "Content-type": "application/json"
+                    },
+                    body: JSON.stringify({ user: app.username })
+                })
+            }
         },
         keyEvents: function (e) {
-            if (this.page == "test") {
+            if (this.page == "game") {
                 if (e.which == 87) {
                     this.gameMove("up")
                 } else if (e.which == 65) {
@@ -100,18 +124,19 @@ var app = new Vue({
             }
         },
         checkUsername: function () {
-            if (this.username != "") {
+            if (this.testUsername != "") {
                 //check for valid username
                 fetch(`${url}/users`).then(function (res) {
                     res.json().then(function (data) {
                         app.badName = false
                         for (let index = 0; index < data.users.length; index++) {
-                            if (app.username == data.users[index]) {
+                            if (app.testUsername == data.users[index]) {
                                 app.badName = true
                             }
                         }
 
                         if (!app.badName) {
+                            app.username = app.testUsername
                             //post valid name
                             fetch(`${url}/users`, {
                                 method: "POST",
@@ -120,23 +145,60 @@ var app = new Vue({
                                 },
                                 body: JSON.stringify({ username: app.username })
                             }).then(function () {
-                                app.page = "messaging"
+                                //put user in messaging room
+                                fetch(`${url}/globalMessaging/users`, {
+                                    method: "POST",
+                                    headers: {
+                                        "Content-type": "application/json"
+                                    },
+                                    body: JSON.stringify({ user: app.username })
+                                }).then(function() {
+                                    app.welcome = true
+                                    app.page = "globalMessaging"
+                                })
                             });
                         }
                     });
                 });
             }
         },
+        switchRoom: function (room) {
+            if (this.page == "game") {
+                app.characterCreated = false
+                clearInterval(app.interval)
+            }
+
+            //remove user from old room
+            fetch(`${url}/${app.page}/users`, {
+                method: "PUT",
+                headers: {
+                    "Content-type": "application/json"
+                },
+                body: JSON.stringify({ user: app.username })
+            })
+
+            //add user to new room
+            fetch(`${url}/${room}/users`, {
+                method: "POST",
+                headers: {
+                    "Content-type": "application/json"
+                },
+                body: JSON.stringify({ user: app.username })
+            }).then(function () {
+                app.page = room;
+                app.welcome = false
+            })
+        },
         getMessages: function (route, callback) {
-            fetch(`${url}/${route}`).then(function (res) {
+            fetch(`${url}/${route}/messaging`).then(function (res) {
                 res.json().then(function (data) {
-                    callback && callback(data.history)
+                    callback && callback(data.history, data.users)
                 });
             });
         },
         sendMessage: function (route, message, callback) {
             if (message.text != "") {
-                fetch(`${url}/${route}`, {
+                fetch(`${url}/${route}/messaging`, {
                     method: "POST",
                     headers: {
                         "Content-type": "application/json"
@@ -155,42 +217,35 @@ var app = new Vue({
             });
         },
         gameMove: function (move) {
-            fetch(`${url}/game`, {
-                method: "POST",
-                headers: {
-                    "Content-type": "application/json"
-                },
-                body: JSON.stringify({ move: move, user: app.username })
-            }).then(function () {
-                app.updateGame()
-            });
+            if (this.characterCreated) {
+                fetch(`${url}/game`, {
+                    method: "POST",
+                    headers: {
+                        "Content-type": "application/json"
+                    },
+                    body: JSON.stringify({ move: move, user: app.username })
+                }).then(function () {
+                    app.updateGame()
+                });
+            }
         },
         createCharacter: function () {
-            fetch(`${url}/game/color/${app.username}`, {
+            //set game timer
+            this.interval = setInterval(() => {
+                this.updateGame()
+            }, UPDATE_INTERVAL);
+
+            //create character for user
+            fetch(`${url}/game/login`, {
                 method: "POST",
                 headers: {
                     "Content-type": "application/json"
                 },
-                body: JSON.stringify({ color: color })
+                body: JSON.stringify({ username: app.username, color: color })
             }).then(function () {
+                app.characterCreated = true
                 app.updateGame()
             });
-
-                        //set game timer
-                        this.interval = setInterval(() => {
-                            this.updateGame()
-                        }, UPDATE_INTERVAL);
-            
-                        //create character for user
-                        fetch(`${url}/game/login`, {
-                            method: "POST",
-                            headers: {
-                                "Content-type": "application/json"
-                            },
-                            body: JSON.stringify({ username: app.username })
-                        }).then(function () {
-                            app.updateGame()
-                        });
         }
     },
 
