@@ -1,9 +1,10 @@
-const url = 'https://server-rooms.herokuapp.com'
-//const url = 'http://localhost:3000'
+//const url = 'https://server-rooms.herokuapp.com'
+const url = 'http://localhost:3000'
 
 const UPDATE_INTERVAL = 1000
 
 var Messaging = {
+    name: 'Messaging',
     props: ['route'],
     data: function () {
         return {
@@ -11,7 +12,6 @@ var Messaging = {
             history: [],
             users: [],
             timer: "",
-            bool: true
         }
     },
     methods: {
@@ -20,12 +20,14 @@ var Messaging = {
             this.newMessage = ""
         },
         getMessages: function () {
-            //console.log("mounted getMessage ", this.route)
             app.getMessages(this.route, this.updateData)
         },
         updateData: function (newHistory, newUsers) {
             this.history = newHistory
             this.users = newUsers
+        },
+        isLast: function (user) {
+            return this.users[this.users.length - 1] == user
         }
     },
     mounted() {
@@ -46,7 +48,7 @@ var Messaging = {
                         <v-text-field label="start typing" v-model="newMessage" outline color="grey"
                             @keyup.enter="sendMessage()">
                         </v-text-field>
-                        Current users:<span v-for="user in this.users"> {{user}}<span v-if="this.bool">,</span></span>
+                        Current users:<span v-for="user in this.users"> {{user}}<span v-if="!isLast(user)">,</span></span>
                     </v-card-text>
                     <v-card-actions>
                         <v-btn block @click="sendMessage()">send</v-btn>
@@ -54,26 +56,92 @@ var Messaging = {
                 </v-card>`
 }
 
+var UserSearch = {
+    name: 'UserSearch',
+    data: function () {
+        return {
+            searchQuery: "",
+            users: [],
+            selected: "",
+            timer: "",
+        }
+    },
+    methods: {
+        getUsers: function (callback) {
+            fetch(`${url}/users`).then(function (res) {
+                res.json().then(function (data) {
+                    callback && callback(data.users)
+                });
+            });
+        },
+        updateData: function (newUsers) {
+            this.users = newUsers
+        },
+        invite: function (name) {
+            if (name != "") {
+                console.log(name, " will be invited to " + app.page)
+                fetch(`${url}/invites/${name}`, {
+                    method: "POST",
+                    headers: {
+                        "Content-type": "application/json"
+                    },
+                    body: JSON.stringify({ room: `${app.username}-${app.page}`, from: app.username })
+                })
+            }
+        }
+    },
+    mounted() {
+        this.getUsers(this.updateData)
+        this.timer = setInterval(() => {
+            this.getUsers(this.updateData)
+        }, UPDATE_INTERVAL);
+    },
+    beforeDestroy() {
+        clearInterval(this.timer)
+    },
+    template: `<v-card elevation="18">
+                    <v-subheader class="pa-0">Add User to Room</v-subheader>
+                    <v-autocomplete v-model="searchQuery" :items="users" no-data-text="No Users">
+                        <template v-slot:append-outer>
+                            <v-slide-x-reverse-transition mode="out-in">
+                            </v-slide-x-reverse-transition>
+                        </template>
+                    </v-autocomplete>
+                    <v-btn v-bind:disabled="searchQuery == '' || searchQuery == app.username" @click="invite(searchQuery)">Send Invite</v-btn>
+                </v-card>`
+}
+
 var app = new Vue({
     el: "#app",
     components: {
-        'messaging': Messaging
+        'messaging': Messaging,
+        'usersearch': UserSearch,
     },
 
     data: {
         page: "login",
-        rooms: [
-            "globalMessaging",
-            "otherMessaging",
-            "game"
-        ],
+        rooms: {
+            "main": {
+                type: "public",
+                host: ""
+            },
+            "privateMessaging": {
+                type: "private",
+                host: ""
+            },
+            "game": {
+                type: "public",
+                host: ""
+            },
+        },
         welcome: true,
         testUsername: "",
         username: "",
         badName: false,
+        globalTimer: "",
+        invites: [],
         characters: [],
         characterCreated: false,
-        interval: "",
         playerColor: "red",
         color: {
             "r": 255,
@@ -87,26 +155,23 @@ var app = new Vue({
     },
 
     methods: {
+        // When user closes page
         onLeave: function (e) {
-            e.preventDefault();
-            
+            //if user has logged in
             if (app.username != "") {
-                //remove user from last room
-                fetch(`${url}/${app.page}/users`, {
+                //get current room
+                var currentRoom = app.page
+                if (app.rooms[app.page].host != "") {
+                    currentRoom = `${app.rooms[app.page].host}-${app.page}`
+                }
+
+                //log user off
+                fetch(`${url}/users`, {
                     method: "PUT",
                     headers: {
                         "Content-type": "application/json"
                     },
-                    body: JSON.stringify({ user: app.username })
-                })
-
-                //remove user from global users
-                fetch(`${url}/users`, {
-                    method: "DELETE",
-                    headers: {
-                        "Content-type": "application/json"
-                    },
-                    body: JSON.stringify({ user: app.username })
+                    body: JSON.stringify({ user: app.username, room: currentRoom })
                 })
             }
         },
@@ -123,6 +188,7 @@ var app = new Vue({
                 }
             }
         },
+        // Log user in
         checkUsername: function () {
             if (this.testUsername != "") {
                 //check for valid username
@@ -146,15 +212,27 @@ var app = new Vue({
                                 body: JSON.stringify({ username: app.username })
                             }).then(function () {
                                 //put user in messaging room
-                                fetch(`${url}/globalMessaging/users`, {
+                                fetch(`${url}/main/users`, {
                                     method: "POST",
                                     headers: {
                                         "Content-type": "application/json"
                                     },
                                     body: JSON.stringify({ user: app.username })
-                                }).then(function() {
+                                }).then(function () {
                                     app.welcome = true
-                                    app.page = "globalMessaging"
+                                    app.page = "main"
+
+                                    //check for invites
+                                    app.globalTimer = setInterval(() => {
+                                        app.getInvites()
+                                    }, UPDATE_INTERVAL);
+
+                                    //set private room hosts to all be this user
+                                    Object.keys(app.rooms).forEach(room => {
+                                        if (app.rooms[room].type == "private") {
+                                            app.rooms[room].host = app.username
+                                        }
+                                    });
                                 })
                             });
                         }
@@ -162,14 +240,60 @@ var app = new Vue({
                 });
             }
         },
+        getInvites: function () {
+            fetch(`${url}/invites/${app.username}`).then(function (res) {
+                res.json().then(function (data) {
+                    app.invites = data.invites
+                });
+            })
+        },
+        acceptInvite: function (room) {
+            //split room into host name and room type
+            var index = room.indexOf("-")
+            var roomHost = room.substring(0, index)
+            var roomType = room.substring(index + 1, room.length)
+            app.rooms[roomType].host = roomHost
+
+            fetch(`${url}/${room}/invite`, {
+                method: "PUT",
+                headers: {
+                    "Content-type": "application/json"
+                },
+                body: JSON.stringify({ user: app.username, from: roomHost })
+            }).then(function () {
+                switchRoom(roomType)
+            })
+        },
+        declineInvite: function (room) {
+            //split room into host name and room type
+            var index = room.indexOf("-")
+            var roomHost = room.substring(0, index)
+
+            fetch(`${url}/invites/${app.username}`, {
+                method: "DELETE",
+                headers: {
+                    "Content-type": "application/json"
+                },
+                body: JSON.stringify({ room: room, from: roomHost })
+            }).then(function () {
+                app.getInvites()
+            })
+        },
         switchRoom: function (room) {
             if (this.page == "game") {
                 app.characterCreated = false
                 clearInterval(app.interval)
             }
 
+            //set old route
+            var route = app.page
+            if (app.rooms[app.page].type == "private") {
+                //for private rooms
+                route = `${app.rooms[app.page].host}-${app.page}`
+            }
+
             //remove user from old room
-            fetch(`${url}/${app.page}/users`, {
+            fetch(`${url}/${route}/users`, {
                 method: "PUT",
                 headers: {
                     "Content-type": "application/json"
@@ -177,8 +301,15 @@ var app = new Vue({
                 body: JSON.stringify({ user: app.username })
             })
 
+            //set new route
+            route = room
+            if (app.rooms[room].type == "private") {
+                //for private rooms
+                route = `${app.rooms[room].host}-${room}`
+            }
+
             //add user to new room
-            fetch(`${url}/${room}/users`, {
+            fetch(`${url}/${route}/users`, {
                 method: "POST",
                 headers: {
                     "Content-type": "application/json"
@@ -190,6 +321,10 @@ var app = new Vue({
             })
         },
         getMessages: function (route, callback) {
+            if (app.rooms[app.page].type == "private") {
+                route = `${app.rooms[app.page].host}-${app.page}`
+            }
+
             fetch(`${url}/${route}/messaging`).then(function (res) {
                 res.json().then(function (data) {
                     callback && callback(data.history, data.users)
@@ -198,6 +333,10 @@ var app = new Vue({
         },
         sendMessage: function (route, message, callback) {
             if (message.text != "") {
+                if (app.rooms[app.page].type == "private") {
+                    route = `${app.rooms[app.page].host}-${app.page}`
+                }
+
                 fetch(`${url}/${route}/messaging`, {
                     method: "POST",
                     headers: {

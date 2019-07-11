@@ -14,18 +14,23 @@
 <div id="app" v-cloak>
     <v-app dark>
         <v-content>
+
+            <!-- TOOLBAR -->
             <v-toolbar fixed app v-if="page != 'login'">
                 <v-toolbar-title>ROOMS</v-toolbar-title>
                 <v-spacer></v-spacer>
                 <v-toolbar-items>
-                    <v-btn flat v-for="room in rooms" v-on:click="switchRoom(room)">{{room}}</v-btn>
+                    <v-btn flat v-for="room in Object.keys(rooms)" v-on:click="switchRoom(room)">{{room}}</v-btn>
                 </v-toolbar-items>
             </v-toolbar>
-            <v-card-title class="display-1 justify-center" v-if="page != 'login' && welcome">Welcome {{username}}!</v-card-title>
+            <v-card-title class="display-1 justify-center" v-if="page != 'login' && welcome">Welcome {{username}}!
+            </v-card-title>
 
-            <v-container v-if="page == 'login'">
-                <v-card-title class="display-3 justify-center">WELCOME TO ROOMS</v-card-title>
-                <v-layout>
+            <v-container>
+                <v-card-title v-if="page == 'login'" class="display-3 justify-center">WELCOME TO ROOMS</v-card-title>
+
+                <!-- LOGIN -->
+                <v-layout v-if="page == 'login'">
                     <v-flex xs3></v-flex>
                     <v-flex xs6>
                         <v-card id="login" elevation="18">
@@ -38,38 +43,59 @@
                             <v-card-actions>
                                 <v-btn block @click="checkUsername()">enter</v-btn>
                             </v-card-actions>
-                            <v-card-text v-if="badName" class="subheading text-xs-center red">That username is already taken</v-card-text>
+                            <v-card-text v-if="badName" class="subheading text-xs-center red">That username is already
+                                taken</v-card-text>
                         </v-card>
                     </v-flex>
                     <v-flex xs3></v-flex>
                 </v-layout>
-            </v-container>
 
-            <v-container v-if="page == 'globalMessaging'">
-                <v-card-title class="display-1 justify-center">WELCOME TO THE GLOBAL CHAT ROOM</v-card-title>
-                <v-layout>
-                    <v-flex xs3></v-flex>
+                <!-- GLOBAL MESSAGING -->
+                <v-layout v-if="page == 'main'">
+                    <v-flex xs3>
+                        <v-card elevation="18">
+                            <v-card-title class="subheading justify-center">YOUR INVITES</v-card-title>
+                            <div v-for="invite in invites">
+                                <v-card-text>{{invite}}</v-card-text>
+                                <v-btn @click="acceptInvite(invite)">Accept</v-btn>
+                                <v-btn @click="declineInvite(invite)">Decline</v-btn>
+                            </div>
+                        </v-card>
+                    </v-flex>
                     <v-flex xs6>
-                        <Messaging v-bind:route="'globalMessaging'" v-bind:key="1"></Messaging>
+                        <v-card-title class="display-1 justify-center">MAIN CHATROOM</v-card-title>
+                        <Messaging v-bind:route="'main'" v-bind:key="1"></Messaging>
                     </v-flex>
                     <v-flex xs3></v-flex>
                 </v-layout>
-            </v-container>
 
-            <v-container v-if="page == 'game'">
-                <v-card-title class="display-1 justify-center">WELCOME TO THE GAME ROOM</v-card-title>
-                <v-layout>
-                    <v-flex xs2>
+                <!-- PRIVATE MESSAGING -->
+                <v-layout v-if="page == 'privateMessaging'">
+                    <v-flex xs3></v-flex>
+                    <v-flex xs6>
+                        <v-card-title class="display-1 justify-center">YOUR CHATROOM</v-card-title>
+                        <Messaging v-bind:route="'privateMessaging'" v-bind:key="2"></Messaging>
+                    </v-flex>
+                    <v-flex xs3>
+                        <UserSearch></UserSearch>
+                    </v-flex>
+                </v-layout>
+
+                <!-- GAME -->
+                <v-layout v-if="page == 'game'">
+                    <v-flex xs3>
                         <v-card elevation="18">
                             <v-card-title class="subheading justify-center">PICK YOUR COLOR</v-card-title>
-                            <div id="color-picker" v-bind:style="{ backgroundColor: 'rgb(' + color.r + ',' + color.g + ',' + color.b + ')' }"></div>
+                            <div id="color-picker"
+                                v-bind:style="{ backgroundColor: 'rgb(' + color.r + ',' + color.g + ',' + color.b + ')' }">
+                            </div>
                             <v-slider v-model="color.r" :max="255" :min="0" :step="1"></v-slider>
                             <v-slider v-model="color.g" :max="255" :min="0" :step="1"></v-slider>
                             <v-slider v-model="color.b" :max="255" :min="0" :step="1"></v-slider>
                             <v-btn block @click="createCharacter()">Update Color</v-btn>
                         </v-card>
                     </v-flex>
-                    <v-flex xs8>
+                    <v-flex xs3>
                         <v-card elevation="18">
                             <v-card-title class="display-1 justify-center">TESTING</v-card-title>
                             <div id="board">
@@ -80,23 +106,12 @@
                             <v-card-title class="headline justify-center">Use WASD to move</v-card-title>
                         </v-card>
                     </v-flex>
-                    <v-flex xl6 id="game-messages">
-                            <Messaging v-bind:route="'game'"></Messaging>
+                    <v-flex xs3 id="game-messages">
+                        <Messaging v-bind:route="'game'"></Messaging>
                     </v-flex>
                 </v-layout>
-            </v-container>
 
-            <v-container v-if="page == 'otherMessaging'">
-                <v-card-title class="display-1 justify-center">WELCOME TO YOUR CHAT ROOM</v-card-title>
-                <v-layout>
-                    <v-flex xs3></v-flex>
-                    <v-flex xs6>
-                        <Messaging v-bind:route="'otherMessaging'" v-bind:key="2"></Messaging>
-                    </v-flex>
-                    <v-flex xs3></v-flex>
-                </v-layout>
             </v-container>
-
         </v-content>
     </v-app>
 </div>
