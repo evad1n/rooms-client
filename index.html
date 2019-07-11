@@ -83,36 +83,6 @@
                     </v-flex>
                 </v-layout>
 
-                <!-- GAME -->
-                <v-layout v-if="page == 'game'">
-                    <v-flex xs3>
-                        <v-card elevation="18">
-                            <v-card-title class="subheading justify-center">PICK YOUR COLOR</v-card-title>
-                            <div id="color-picker"
-                                v-bind:style="{ backgroundColor: 'rgb(' + color.r + ',' + color.g + ',' + color.b + ')' }">
-                            </div>
-                            <v-slider v-model="color.r" :max="255" :min="0" :step="1"></v-slider>
-                            <v-slider v-model="color.g" :max="255" :min="0" :step="1"></v-slider>
-                            <v-slider v-model="color.b" :max="255" :min="0" :step="1"></v-slider>
-                            <v-btn block @click="createCharacter()">Update Color</v-btn>
-                        </v-card>
-                    </v-flex>
-                    <v-flex xs3>
-                        <v-card elevation="18">
-                            <v-card-title class="display-1 justify-center">TESTING</v-card-title>
-                            <div id="board">
-                                <div v-for="character in characters"
-                                    v-bind:style="{ top: character.position.y + 'px', left: character.position.x + 'px', backgroundColor: 'rgb(' + color.r + ',' + color.g + ',' + color.b + ')' }"
-                                    class="character"></div>
-                            </div>
-                            <v-card-title class="headline justify-center">Use WASD to move</v-card-title>
-                        </v-card>
-                    </v-flex>
-                    <v-flex xs3 id="game-messages">
-                        <Messaging v-bind:route="'game'"></Messaging>
-                    </v-flex>
-                </v-layout>
-
             </v-container>
         </v-content>
     </v-app>
