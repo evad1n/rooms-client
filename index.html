@@ -20,7 +20,9 @@
                 <v-toolbar-title>ROOMS</v-toolbar-title>
                 <v-spacer></v-spacer>
                 <v-toolbar-items>
-                    <v-btn flat v-for="room in Object.keys(rooms)" v-on:click="switchRoom(room)">{{room}}</v-btn>
+                    <v-btn flat v-on:click="switchRoom('home')">HOME</v-btn>
+                    <PrivateRoomCategory v-bind:title="'Messaging'" v-bind:options="privateMessageRooms"></PrivateRoomCategory>
+                    <PrivateRoomCategory v-bind:title="'Games'" v-bind:options="privateGameRooms"></PrivateRoomCategory>
                 </v-toolbar-items>
             </v-toolbar>
             <v-card-title class="display-1 justify-center" v-if="page != 'login' && welcome">Welcome {{username}}!
@@ -51,30 +53,30 @@
                 </v-layout>
 
                 <!-- GLOBAL MESSAGING -->
-                <v-layout v-if="page == 'main'">
+                <v-layout v-if="page == 'home'">
                     <v-flex xs3>
                         <v-card elevation="18">
                             <v-card-title class="subheading justify-center">YOUR INVITES</v-card-title>
                             <div v-for="invite in invites">
                                 <v-card-text>{{invite}}</v-card-text>
-                                <v-btn @click="acceptInvite(invite)">Accept</v-btn>
-                                <v-btn @click="declineInvite(invite)">Decline</v-btn>
+                                <v-btn @click="respondInvite(invite, true)">Accept</v-btn>
+                                <v-btn @click="respondInvite(invite, false)">Decline</v-btn>
                             </div>
                         </v-card>
                     </v-flex>
                     <v-flex xs6>
-                        <v-card-title class="display-1 justify-center">MAIN CHATROOM</v-card-title>
-                        <Messaging v-bind:route="'main'" v-bind:key="1"></Messaging>
+                        <v-card-title class="display-2 justify-center">HOME</v-card-title>
+                        <Messaging v-bind:route="'home'" v-bind:key="1"></Messaging>
                     </v-flex>
                     <v-flex xs3></v-flex>
                 </v-layout>
 
                 <!-- PRIVATE MESSAGING -->
-                <v-layout v-if="page == 'privateMessaging'">
+                <v-layout v-for="(room, index) in Object.keys(privateMessageRooms)" v-if="page == room">
                     <v-flex xs3></v-flex>
                     <v-flex xs6>
-                        <v-card-title class="display-1 justify-center">YOUR CHATROOM</v-card-title>
-                        <Messaging v-bind:route="'privateMessaging'" v-bind:key="2"></Messaging>
+                        <v-card-title class="display-1 justify-center">{{privateMessageRooms[room].name}}</v-card-title>
+                        <Messaging v-bind:route="room" v-bind:key="index"></Messaging>
                     </v-flex>
                     <v-flex xs3>
                         <UserSearch></UserSearch>

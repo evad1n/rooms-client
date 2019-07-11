@@ -1,7 +1,38 @@
-const url = 'https://server-rooms.herokuapp.com'
-//const url = 'http://localhost:3000'
+//const url = 'https://server-rooms.herokuapp.com'
+const url = 'http://localhost:3000'
 
 const UPDATE_INTERVAL = 1000
+
+var PrivateRoomCategory = {
+    name: 'PrivateRoomCategory',
+    props: ['options', 'title'],
+    data: function () {
+        return {
+            rooms: {},
+        }
+    },
+    methods: {
+
+    },
+    mounted() {
+        this.rooms = this.options
+    },
+    beforeDestroy() {
+
+    },
+    template: `<v-menu offset-y>
+                    <template v-slot:activator="{ on }">
+                        <v-btn flat v-on="on">
+                            {{title}}
+                        </v-btn>
+                    </template>
+                    <v-list>
+                        <v-list-tile v-for="(room, index) in Object.keys(this.rooms)" :key="index" @click="app.switchRoom(room)">
+                            <v-list-tile-title>{{ rooms[room].name }}</v-list-tile-title>
+                        </v-list-tile>
+                    </v-list>
+                </v-menu>`
+}
 
 var Messaging = {
     name: 'Messaging',
@@ -41,9 +72,9 @@ var Messaging = {
     },
     template: `<v-card elevation="18">
                     <v-card-title class="display-1 justify-center">Messaging</v-card-title>
-                    <v-card-text v-for="message in this.history">
+                    <p class="messages" v-for="message in this.history">
                         {{message.user}}: {{message.text}}
-                    </v-card-text>
+                    </p>
                     <v-card-text>
                         <v-text-field label="start typing" v-model="newMessage" outline color="grey"
                             @keyup.enter="sendMessage()">
@@ -116,23 +147,20 @@ var app = new Vue({
     components: {
         'messaging': Messaging,
         'usersearch': UserSearch,
+        'privateroomcategory': PrivateRoomCategory,
     },
 
     data: {
         page: "login",
-        rooms: {
-            "main": {
-                type: "public",
-                host: ""
-            },
-            "privateMessaging": {
-                type: "private",
-                host: ""
-            },
-            "game": {
-                type: "public",
-                host: ""
-            },
+        publicRooms: [
+            "home"
+        ],
+        games: [
+            "shit game"
+        ],
+        privateMessageRooms: {
+        },
+        privateGameRooms: {
         },
         welcome: true,
         testUsername: "",
@@ -212,7 +240,7 @@ var app = new Vue({
                                 body: JSON.stringify({ username: app.username })
                             }).then(function () {
                                 //put user in messaging room
-                                fetch(`${url}/main/users`, {
+                                fetch(`${url}/home/users`, {
                                     method: "POST",
                                     headers: {
                                         "Content-type": "application/json"
@@ -220,19 +248,15 @@ var app = new Vue({
                                     body: JSON.stringify({ user: app.username })
                                 }).then(function () {
                                     app.welcome = true
-                                    app.page = "main"
+                                    app.page = "home"
 
                                     //check for invites
                                     app.globalTimer = setInterval(() => {
                                         app.getInvites()
                                     }, UPDATE_INTERVAL);
 
-                                    //set private room hosts to all be this user
-                                    Object.keys(app.rooms).forEach(room => {
-                                        if (app.rooms[room].type == "private") {
-                                            app.rooms[room].host = app.username
-                                        }
-                                    });
+                                    //set personal chat room
+                                    app.privateMessageRooms[`${app.username}-privateMessaging`] = { name: "Your Chat Room" }
                                 })
                             });
                         }
@@ -247,50 +271,51 @@ var app = new Vue({
                 });
             })
         },
-        acceptInvite: function (room) {
+        respondInvite: function (room, accepted) {
             //split room into host name and room type
             var index = room.indexOf("-")
             var roomHost = room.substring(0, index)
             var roomType = room.substring(index + 1, room.length)
-            app.rooms[roomType].host = roomHost
+            if (accepted) {
+                if (roomType == "privateMessaging") {
+                    app.privateMessageRooms[room] = { name: `${roomHost}'s room` }
+                } else {
+                    app.privateGameRooms[room] = { name: `${roomHost}'s ${roomType}` }
+                }
+            }
 
             fetch(`${url}/${room}/invite`, {
                 method: "PUT",
                 headers: {
                     "Content-type": "application/json"
                 },
-                body: JSON.stringify({ user: app.username, from: roomHost })
+                body: JSON.stringify({ user: app.username, from: roomHost, accepted: accepted })
             }).then(function () {
-                switchRoom(roomType)
-            })
-        },
-        declineInvite: function (room) {
-            //split room into host name and room type
-            var index = room.indexOf("-")
-            var roomHost = room.substring(0, index)
-
-            fetch(`${url}/invites/${app.username}`, {
-                method: "DELETE",
-                headers: {
-                    "Content-type": "application/json"
-                },
-                body: JSON.stringify({ room: room, from: roomHost })
-            }).then(function () {
+                if (accepted) {
+                    app.switchRoom(roomType)
+                }
                 app.getInvites()
             })
         },
+        createGameRoom: function (room) {
+            //set up game room
+            app.privateGameRooms[room] = {name: `your ${room}`}
+            //idk lol!
+        },
         switchRoom: function (room) {
-            if (this.page == "game") {
-                app.characterCreated = false
-                clearInterval(app.interval)
-            }
+            //room name is personal
+            //game name is game
+            // if (this.page == "game") {
+            //     app.characterCreated = false
+            //     clearInterval(app.interval)
+            // }
 
             //set old route
             var route = app.page
-            if (app.rooms[app.page].type == "private") {
-                //for private rooms
-                route = `${app.rooms[app.page].host}-${app.page}`
-            }
+            // if (app.rooms[app.page].type == "private") {
+            //     //for private rooms
+            //     route = `${app.rooms[app.page].host}-${app.page}`
+            // }
 
             //remove user from old room
             fetch(`${url}/${route}/users`, {
@@ -303,10 +328,10 @@ var app = new Vue({
 
             //set new route
             route = room
-            if (app.rooms[room].type == "private") {
-                //for private rooms
-                route = `${app.rooms[room].host}-${room}`
-            }
+            // if (app.rooms[room].type == "private") {
+            //     //for private rooms
+            //     route = `${app.rooms[room].host}-${room}`
+            // }
 
             //add user to new room
             fetch(`${url}/${route}/users`, {
@@ -321,10 +346,6 @@ var app = new Vue({
             })
         },
         getMessages: function (route, callback) {
-            if (app.rooms[app.page].type == "private") {
-                route = `${app.rooms[app.page].host}-${app.page}`
-            }
-
             fetch(`${url}/${route}/messaging`).then(function (res) {
                 res.json().then(function (data) {
                     callback && callback(data.history, data.users)
@@ -333,10 +354,6 @@ var app = new Vue({
         },
         sendMessage: function (route, message, callback) {
             if (message.text != "") {
-                if (app.rooms[app.page].type == "private") {
-                    route = `${app.rooms[app.page].host}-${app.page}`
-                }
-
                 fetch(`${url}/${route}/messaging`, {
                     method: "POST",
                     headers: {

@@ -6,6 +6,10 @@
     margin-top: calc(50vh - 250px);
 }
 
+.messages{
+    margin: 2px 5px 2px 5px;
+}
+
 #board{
     width: 500px;
     height: 500px;
