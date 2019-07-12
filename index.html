@@ -16,15 +16,17 @@
         <v-content>
 
             <!-- TOOLBAR -->
-            <v-toolbar fixed app v-if="page != 'login'">
-                <v-toolbar-title>ROOMS</v-toolbar-title>
+            <v-toolbar fixed app color="deep-purple darken-2" v-if="page != 'login'">
+                <v-toolbar-title>Rooms</v-toolbar-title>
                 <v-spacer></v-spacer>
                 <v-toolbar-items>
-                    <v-btn flat v-on:click="switchRoom('home')">HOME</v-btn>
-                    <PrivateRoomCategory v-bind:title="'Messaging'" v-bind:type="'messages'"></PrivateRoomCategory>
-                    <PrivateRoomCategory v-bind:title="'Game Rooms'" v-bind:type="'games'"></PrivateRoomCategory>
+                        <v-btn flat v-on:click="switchRoom('home')">HOME</v-btn>
+                        <PrivateRoomCategory v-bind:title="'Messaging'" v-bind:type="'messages'"></PrivateRoomCategory>
+                        <PrivateRoomCategory v-bind:title="'Game Rooms'" v-bind:type="'games'"></PrivateRoomCategory>
                 </v-toolbar-items>
             </v-toolbar>
+
+
             <v-card-title class="display-1 justify-center" v-if="page != 'login' && welcome">Welcome {{username}}!
             </v-card-title>
 
