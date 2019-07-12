@@ -95,13 +95,13 @@
                 <v-layout v-for="(room, index) in Object.keys(privateGameRooms)" v-if="page == room">
                     <v-flex xs3>
                         <UserSearch v-if="getRoomHost(room) == username"></UserSearch>
+                        <v-select :items="pictionary.colors" v-model="pictionary.marker_color"></v-select>
                     </v-flex>
                     <v-flex xs6>
                         <v-card-title class="display-1 justify-center">{{privateGameRooms[room].name}}</v-card-title>
                         <!-- GAME BOARD HERE -->
                         <div v-if="getRoomType(page) == 'pictionary'">
-                            <v-btn @click="pictionary.activatePictionary()">Play</v-btn>
-                            <v-btn @click="pictionary.resetPictionary()">Reset</v-btn>
+                            <v-btn v-if="getRoomHost(room) == username" @click="pictionary.activatePictionary()">Start</v-btn>
                             <canvas id="pictionary" ref="canvas" v-canvas width="400px" height="400px"></canvas>
                         </div>
                     </v-flex>

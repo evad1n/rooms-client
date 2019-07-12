@@ -196,19 +196,14 @@ var app = new Vue({
     },
 
     methods: {
-        // When user closes page
-        onLeave: function (e) {
-            //if user has logged in
-            if (app.username != "") {
-                //log user off
-                fetch(`${url}/users`, {
-                    method: "PUT",
-                    headers: {
-                        "Content-type": "application/json"
-                    },
-                    body: JSON.stringify({ user: app.username, room: app.page })
-                })
-            }
+        refreshLogin: function () {
+            fetch(`${url}/users`, {
+                method: "PUT",
+                headers: {
+                    "Content-type": "application/json"
+                },
+                body: JSON.stringify({ user: app.username })
+            })
         },
         keyEvents: function (e) {
             if (this.page == "game") {
@@ -244,7 +239,7 @@ var app = new Vue({
                                 headers: {
                                     "Content-type": "application/json"
                                 },
-                                body: JSON.stringify({ username: app.username })
+                                body: JSON.stringify({ user: app.username })
                             }).then(function () {
                                 //put user in messaging room
                                 fetch(`${url}/home/users`, {
@@ -257,9 +252,10 @@ var app = new Vue({
                                     app.welcome = true
                                     app.page = "home"
 
-                                    //check for invites
+                                    // START GLOBAL INTERVAL
                                     app.globalTimer = setInterval(() => {
                                         app.getInvites()
+                                        app.refreshLogin()
                                     }, UPDATE_INTERVAL);
 
                                     //set personal chat room
@@ -311,11 +307,6 @@ var app = new Vue({
             app.switchRoom(roomName)
         },
         switchRoom: function (room) {
-            // if (this.page == "game") {
-            //     app.characterCreated = false
-            //     clearInterval(app.interval)
-            // }
-
             //set old route
             var route = app.page
 
@@ -405,7 +396,7 @@ var app = new Vue({
                 headers: {
                     "Content-type": "application/json"
                 },
-                body: JSON.stringify({ username: app.username, color: color })
+                body: JSON.stringify({ user: app.username, color: color })
             }).then(function () {
                 app.characterCreated = true
                 app.updateGame()
@@ -417,5 +408,3 @@ var app = new Vue({
 
     }
 })
-
-window.onbeforeunload = app.onLeave;

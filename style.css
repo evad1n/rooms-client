@@ -10,22 +10,7 @@
     margin: 2px 5px 2px 5px;
 }
 
-#board{
-    width: 500px;
-    height: 500px;
-    background: black;
-    margin: 0 auto;
-    margin-bottom: 10px;
-}
-
-.character{
-    background-color: red;
-    position: relative;
-    width: 10px;
-    height: 10px;
-    top: 250px;
-    left: 250px;
-}
+/* GAME STUFF */
 
 #game-messages{
     position: absolute;
@@ -33,7 +18,8 @@
     right: 50px;
 }
 
-#color-picker{
-    width: 200px;
-    height: 200px;
+/* PICTIONARY */
+
+#pictionary {
+    background-color: #FFF;
 }
