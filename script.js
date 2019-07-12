@@ -181,14 +181,12 @@ var app = new Vue({
         badName: false,
         globalTimer: "",
         invites: [],
-        characters: [],
-        characterCreated: false,
-        playerColor: "red",
-        color: {
-            "r": 255,
-            "g": 0,
-            "b": 0
-        }
+        sidebars: [
+            "invite",
+            "chat"
+        ],
+        current_sidebar: "chat",
+        sidebar: false,
     },
 
     created: function () {
