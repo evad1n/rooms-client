@@ -5,6 +5,12 @@ const PICTIONARY_INTERVAL = 500
 
 var pictionary = new Vue({
     data: {
+        sidebars: [
+            "invite",
+            "chat"
+        ],
+        current_sidebar: "chat",
+        sidebar: false,
         colors: [
             "red", "orange", "yellow", "green", "blue", "purple", "black", "white"
         ],
@@ -97,7 +103,7 @@ var pictionary = new Vue({
         getPictionary: function () {
             fetch(`${url}/${app.page}/game`).then(function (res) {
                 res.json().then(function (data) {
-                    console.log(data.context, data.points)
+                    pictionary.points = data.points
                 });
             });
         },
@@ -108,7 +114,6 @@ var pictionary = new Vue({
                     "Content-type": "application/json"
                 },
                 body: JSON.stringify({
-                    context: pictionary.context,
                     points: pictionary.points
                 })
             }).then(function () {
@@ -137,6 +142,8 @@ var pictionary = new Vue({
                     turn: 0,
                     started: true
                 })
+            }).then(function () {
+                pictionary.ready()
             })
         }
     },

@@ -103,13 +103,13 @@
                             <!--Game Socalizing Bar-->
                             <v-toolbar color="deep-purple lighten-1">
                                 <v-toolbar-items>
-                                    <v-btn flat @click="current_sidebar = 'invite'; sidebar = !sidebar;">Invite</v-btn>
-                                    <v-btn flat @click="current_sidebar = 'chat'; sidebar = !sidebar;">Chat</v-btn>
+                                    <v-btn flat @click="pictionary.current_sidebar = 'invite'; pictionary.sidebar = !pictionary.sidebar;">Invite</v-btn>
+                                    <v-btn flat @click="pictionary.current_sidebar = 'chat'; pictionary.sidebar = !pictionary.sidebar;">Chat</v-btn>
                                 </v-toolbar-items>
                             </v-toolbar>
 
                             <!--Game Window-->
-                            <canvas id="pictionary" ref="canvas" v-canvas height="500px"></canvas>
+                            <canvas id="pictionary" ref="canvas" v-canvas height="500px" width="500px"></canvas>
 
                             <!--Game Statistics-->
                             <v-card-text>
@@ -121,18 +121,18 @@
                             <v-card-text>
                                 <v-btn v-if="getRoomHost(room) == username" @click="pictionary.activatePictionary()">
                                     Start</v-btn>
-                                <v-btn @click="pictionary.ready()">Ready</v-btn>
+                                <v-btn v-if="getRoomHost(room) != username" @click="pictionary.ready()">Ready</v-btn>
                                 <v-select :items="pictionary.colors" v-model="pictionary.marker_color"></v-select>
                                 <v-text-field v-if="!pictionary.isTurn" placeholder="What is this drawing?">
                                 </v-text-field>
                             </v-card-text>
                         </v-card>
                     </v-flex>
-                    <v-flex xs3 v-if="sidebar" justify-center>
-                        <v-card v-if="current_sidebar == 'invite'" color="white" height="635px" light>
+                    <v-flex xs3 v-if="pictionary.sidebar" justify-center>
+                        <v-card v-if="pictionary.current_sidebar == 'invite'" color="white" height="635px" light>
                             <UserSearch v-if="getRoomHost(room) == username"></UserSearch>
                         </v-card>
-                        <v-card v-if="current_sidebar == 'chat'" color="white" height="635px" light>
+                        <v-card v-if="pictionary.current_sidebar == 'chat'" color="white" height="635px" light>
                             <Messaging v-bind:route="room" v-bind:key="index"></Messaging>
                         </v-card>
                     </v-flex>
