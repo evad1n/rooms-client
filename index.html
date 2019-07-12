@@ -93,22 +93,6 @@
                     <v-flex xs3></v-flex>
                 </v-layout>
 
-<<<<<<< HEAD
-                <!-- GAMES -->
-                <v-layout v-for="(room, index) in Object.keys(privateGameRooms)" v-if="page == room">
-                    <v-flex xs3>
-                        <UserSearch v-if="getRoomHost(room) == username"></UserSearch>
-                        <v-select :items="pictionary.colors" v-model="pictionary.marker_color"></v-select>
-                    </v-flex>
-                    <v-flex xs6>
-                        <v-card-title class="display-1 justify-center">{{privateGameRooms[room].name}}</v-card-title>
-                        <!-- GAME BOARD HERE -->
-                        <div v-if="getRoomType(page) == 'pictionary'">
-                            <v-btn v-if="getRoomHost(room) == username" @click="pictionary.activatePictionary()">Start</v-btn>
-                            <v-btn @click="pictionary.ready()">Ready</v-btn>
-                            <canvas id="pictionary" ref="canvas" v-canvas width="400px" height="400px"></canvas>
-                        </div>
-=======
                 <!--NEW FORMAT-->
                 <v-layout v-for="(room, index) in Object.keys(privateGameRooms)" v-if="page == room" justify-center>
                     <v-flex xs8>
@@ -137,11 +121,12 @@
                             <v-card-text>
                                 <v-btn v-if="getRoomHost(room) == username" @click="pictionary.activatePictionary()">
                                     Start</v-btn>
+                                <v-btn @click="pictionary.ready()">Ready</v-btn>
                                 <v-select :items="pictionary.colors" v-model="pictionary.marker_color"></v-select>
-                                <v-text-field v-if="!pictionary.isTurn" placeholder="What is this drawing?"></v-text-field>
+                                <v-text-field v-if="!pictionary.isTurn" placeholder="What is this drawing?">
+                                </v-text-field>
                             </v-card-text>
                         </v-card>
->>>>>>> d2a28adb904ba44bcb9aecd7071769d253b9a482
                     </v-flex>
                     <v-flex xs3 v-if="sidebar" justify-center>
                         <v-card v-if="current_sidebar == 'invite'" color="white" height="635px" light>
