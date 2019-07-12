@@ -18,7 +18,17 @@ var pictionary = new Vue({
         points: [],
         timer: null,
         seconds: 0,
+<<<<<<< HEAD
         gameStartTimer: null
+=======
+
+        //UI
+        sidebars: [
+            "invite", "chat"
+        ],
+        current_sidebar: "chat",
+        sidebar: false,
+>>>>>>> d2a28adb904ba44bcb9aecd7071769d253b9a482
     },
     methods: {
         activatePictionary: function () {
