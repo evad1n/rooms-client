@@ -1,5 +1,5 @@
-const url = 'https://server-rooms.herokuapp.com'
-//const url = 'http://localhost:3000'
+//const url = 'https://server-rooms.herokuapp.com'
+const url = 'http://localhost:3000'
 
 const UPDATE_INTERVAL = 1000
 
@@ -41,7 +41,6 @@ var PrivateRoomCategory = {
                     <v-list>
                         <v-list-tile v-for="(room, index) in Object.keys(this.rooms)" :key="index" @click="app.switchRoom(room)">
                             <v-list-tile-title>{{ rooms[room].name }}</v-list-tile-title>
-                            <p v-if="console.log('CHANGED')">idk if i appear!</p>
                         </v-list-tile>
                     </v-list>
                 </v-menu>`
@@ -169,7 +168,8 @@ var app = new Vue({
             "home"
         ],
         games: [
-            "pictionary, go"
+            "pictionary", 
+            "go"
         ],
         privateMessageRooms: {
         },
@@ -304,9 +304,11 @@ var app = new Vue({
             })
         },
         createGameRoom: function (room) {
+            var roomName = `${app.username}-${room}`
             //set up game room
-            app.privateGameRooms[room] = {name: `your ${room}`}
+            app.privateGameRooms[roomName] = {name: `${app.username}'s ${room}`}
             //idk lol!
+            app.switchRoom(roomName)
         },
         switchRoom: function (room) {
             // if (this.page == "game") {
