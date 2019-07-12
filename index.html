@@ -21,8 +21,8 @@
                 <v-spacer></v-spacer>
                 <v-toolbar-items>
                     <v-btn flat v-on:click="switchRoom('home')">HOME</v-btn>
-                    <PrivateRoomCategory v-bind:title="'Messaging'" v-bind:options="privateMessageRooms"></PrivateRoomCategory>
-                    <PrivateRoomCategory v-bind:title="'Games'" v-bind:options="privateGameRooms"></PrivateRoomCategory>
+                    <PrivateRoomCategory v-bind:title="'Messaging'" v-bind:type="'messages'"></PrivateRoomCategory>
+                    <!-- <PrivateRoomCategory v-bind:title="'Game Rooms'" v-bind:type="'games'"></PrivateRoomCategory> -->
                 </v-toolbar-items>
             </v-toolbar>
             <v-card-title class="display-1 justify-center" v-if="page != 'login' && welcome">Welcome {{username}}!
@@ -79,7 +79,7 @@
                         <Messaging v-bind:route="room" v-bind:key="index"></Messaging>
                     </v-flex>
                     <v-flex xs3>
-                        <UserSearch></UserSearch>
+                        <UserSearch v-if="getRoomHost(room) == username"></UserSearch>
                     </v-flex>
                 </v-layout>
 
