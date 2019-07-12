@@ -18,6 +18,13 @@ var pictionary = new Vue({
         points: [],
         timer: null,
         seconds: 0,
+
+        //UI
+        sidebars: [
+            "invite", "chat"
+        ],
+        current_sidebar: "chat",
+        sidebar: false,
     },
     methods: {
         activatePictionary: function () {
