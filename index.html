@@ -93,29 +93,12 @@
                     <v-flex xs3></v-flex>
                 </v-layout>
 
-                <!-- GAMES -->
-                <v-layout v-for="(room, index) in Object.keys(privateGameRooms)" v-if="page == room">
-                    <v-flex xs3>
-                        <UserSearch v-if="getRoomHost(room) == username"></UserSearch>
-                    </v-flex>
-                    <v-flex xs6>
-                        <!-- GAME BOARD HERE -->
-                        <div v-if="getRoomType(page) == 'pictionary'">
-                            <v-btn v-if="getRoomHost(room) == username" @click="pictionary.activatePictionary()">Start
-                            </v-btn>
-                            <canvas id="pictionary" ref="canvas" v-canvas width="400px" height="400px"></canvas>
-                        </div>
-                    </v-flex>
-                    <v-flex xs3>
-                        <Messaging v-bind:route="room" v-bind:key="index"></Messaging>
-                    </v-flex>
-                </v-layout>
-
                 <!--NEW FORMAT-->
                 <v-layout v-for="(room, index) in Object.keys(privateGameRooms)" v-if="page == room" justify-center>
                     <v-flex xs8>
-                        <v-card>
-                            <v-card-title class="display-1 justify-center text-uppercase">{{privateGameRooms[room].name}}</v-card-title>
+                        <v-card v-if="getRoomType(page) == 'pictionary'">
+                            <v-card-title class="display-1 justify-center text-uppercase">
+                                {{privateGameRooms[room].name}}</v-card-title>
 
                             <!--Game Socalizing Bar-->
                             <v-toolbar color="deep-purple lighten-1">
@@ -136,6 +119,8 @@
 
                             <!--Game Controls-->
                             <v-card-text>
+                                <v-btn v-if="getRoomHost(room) == username" @click="pictionary.activatePictionary()">
+                                    Start</v-btn>
                                 <v-select :items="pictionary.colors" v-model="pictionary.marker_color"></v-select>
                                 <v-text-field v-if="!isTurn" placeholder="What is this drawing?"></v-text-field>
                             </v-card-text>
@@ -143,16 +128,10 @@
                     </v-flex>
                     <v-flex xs3 v-if="sidebar" justify-center>
                         <v-card v-if="current_sidebar == 'invite'" color="white" height="635px" light>
-                            <v-card-title class="headline justify-center text-uppercase">Invite</v-card-title>
-                            <v-card-text>
-                                "Hello"
-                            </v-card-text>
+                            <UserSearch v-if="getRoomHost(room) == username"></UserSearch>
                         </v-card>
                         <v-card v-if="current_sidebar == 'chat'" color="white" height="635px" light>
-                            <v-card-title class="headline justify-center text-uppercase">Chat</v-card-title>
-                            <v-card-text v-for="message in messages">
-                                {{message}}
-                            </v-card-text>
+                            <Messaging v-bind:route="room" v-bind:key="index"></Messaging>
                         </v-card>
                     </v-flex>
                 </v-layout>
