@@ -18,6 +18,7 @@ var pictionary = new Vue({
         points: [],
         timer: null,
         seconds: 0,
+        gameStartTimer: null
     },
     methods: {
         activatePictionary: function () {
@@ -27,10 +28,13 @@ var pictionary = new Vue({
             this.canvas.addEventListener('mousemove', this.mousemove);
             document.addEventListener('mouseup', this.mouseup);
 
+            //End ready timer
+            clearInterval(this.gameStartTimer)
+
             //Start timer
             this.timer = setInterval(() => {
                 pictionary.sendPictionary()
-                pictionary.seconds++
+                pictionary.seconds += 0.5
 
                 // END TURN
                 if (pictionary.seconds > 30) {
@@ -111,5 +115,29 @@ var pictionary = new Vue({
                 pictionary.getPictionary()
             });
         },
+        ready: function () {
+            this.gameStartTimer = setInterval(() => {
+                fetch(`${url}/${app.page}/game/start`).then(function (res) {
+                    res.json().then(function (data) {
+                        if (data.started) {
+                            pictionary.activatePictionary()
+                        }
+                    });
+                });
+            }, 1000);
+        },
+        startGame: function () {
+            //Start game
+            fetch(`${url}/${app.page}/game/start`, {
+                method: "POST",
+                headers: {
+                    "Content-type": "application/json"
+                },
+                body: JSON.stringify({
+                    turn: 0,
+                    started: true
+                })
+            })
+        }
     },
 })

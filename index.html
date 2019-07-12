@@ -104,6 +104,7 @@
                         <!-- GAME BOARD HERE -->
                         <div v-if="getRoomType(page) == 'pictionary'">
                             <v-btn v-if="getRoomHost(room) == username" @click="pictionary.activatePictionary()">Start</v-btn>
+                            <v-btn @click="pictionary.ready()">Ready</v-btn>
                             <canvas id="pictionary" ref="canvas" v-canvas width="400px" height="400px"></canvas>
                         </div>
                     </v-flex>
