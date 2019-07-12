@@ -156,7 +156,7 @@ var app = new Vue({
             "home"
         ],
         games: [
-            "shit game"
+            "pictionary, go"
         ],
         privateMessageRooms: {
         },
