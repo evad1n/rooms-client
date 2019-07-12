@@ -16,7 +16,7 @@
         <v-content>
 
             <!-- TOOLBAR -->
-            <v-toolbar fixed app color="deep-purple darken-2" v-if="page != 'login'">
+            <v-toolbar fixed app color="color" v-if="page != 'login'">
                 <v-toolbar-title>Rooms</v-toolbar-title>
                 <v-spacer></v-spacer>
                 <v-toolbar-items>
@@ -26,7 +26,7 @@
                 </v-toolbar-items>
             </v-toolbar>
 
-
+            <!-- WELCOME TEXT -->
             <v-card-title class="display-1 justify-center" v-if="page != 'login' && welcome">Welcome {{username}}!
             </v-card-title>
 
@@ -37,7 +37,7 @@
                 <v-layout v-if="page == 'login'">
                     <v-flex xs3></v-flex>
                     <v-flex xs6>
-                        <v-card id="login" elevation="18" color="blue darken-4">
+                        <v-card id="login" elevation="18">
                             <v-card-title class="display-1 justify-center">Enter a Username</v-card-title>
                             <v-card-text>
                                 <v-text-field label="name" v-model="testUsername" outline color="grey"
@@ -93,7 +93,7 @@
                     <v-flex xs3></v-flex>
                 </v-layout>
 
-                <!--NEW FORMAT-->
+                <!--GAMES-->
                 <v-layout justify-center>
                     <v-flex xs8>
                         <v-card v-for="(room, index) in Object.keys(privateGameRooms)" v-if="page == room">

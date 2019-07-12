@@ -163,6 +163,7 @@ var app = new Vue({
     },
 
     data: {
+        color: "deep-purple lighten-1",
         page: "login",
         publicRooms: [
             "home"
