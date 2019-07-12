@@ -122,7 +122,7 @@
                                 <v-btn v-if="getRoomHost(room) == username" @click="pictionary.activatePictionary()">
                                     Start</v-btn>
                                 <v-select :items="pictionary.colors" v-model="pictionary.marker_color"></v-select>
-                                <v-text-field v-if="!isTurn" placeholder="What is this drawing?"></v-text-field>
+                                <v-text-field v-if="!pictionary.isTurn" placeholder="What is this drawing?"></v-text-field>
                             </v-card-text>
                         </v-card>
                     </v-flex>
