@@ -83,10 +83,10 @@ var Messaging = {
         clearInterval(this.timer)
     },
     template: `<v-card elevation="18">
-                    <v-card-title class="display-1 justify-center">Messaging</v-card-title>
-                    <p class="messages" v-for="message in this.history">
+                    <v-card-title class="headline justify-center text-uppercase">Chat</v-card-title>
+                    <v-card-text v-for="message in this.history">
                         {{message.user}}: {{message.text}}
-                    </p>
+                    </v-card-text>
                     <v-card-text>
                         <v-text-field label="Type a message" v-model="newMessage" outline color="grey"
                             @keyup.enter="sendMessage()">
