@@ -1,16 +1,8 @@
-console.log('pictionary linked')
-
 //PICTIONARY
 const PICTIONARY_INTERVAL = 500
 
 var pictionary = new Vue({
     data: {
-        sidebars: [
-            "invite",
-            "chat"
-        ],
-        current_sidebar: "chat",
-        sidebar: false,
         colors: [
             "red", "orange", "yellow", "green", "blue", "purple", "black", "white"
         ],

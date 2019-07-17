@@ -1,7 +1,7 @@
 //const url = 'https://server-rooms.herokuapp.com'
 const url = 'http://localhost:3000'
 
-const UPDATE_INTERVAL = 1000
+const UPDATE_INTERVAL = 200
 
 var PrivateRoomCategory = {
     name: 'PrivateRoomCategory',
@@ -14,7 +14,7 @@ var PrivateRoomCategory = {
     },
     methods: {
         updateRooms: function () {
-            if(this.type == 'messages') {
+            if (this.type == 'messages') {
                 this.rooms = app.privateMessageRooms
             } else {
                 this.rooms = app.privateGameRooms
@@ -52,73 +52,22 @@ var Messaging = {
     data: function () {
         return {
             newMessage: "",
-            history: [],
-            users: [],
-            timer: "",
-        }
-    },
-    methods: {
-        sendMessage: function () {
-            app.sendMessage(this.route, { "user": app.username, "text": this.newMessage }, this.updateData)
-            this.newMessage = ""
-        },
-        getMessages: function () {
-            app.getMessages(this.route, this.updateData)
-        },
-        updateData: function (newHistory, newUsers) {
-            this.history = newHistory
-            this.users = newUsers
-        },
-        isLast: function (user) {
-            return this.users[this.users.length - 1] == user
-        }
-    },
-    mounted() {
-        this.getMessages()
-        this.timer = setInterval(() => {
-            this.getMessages()
-        }, UPDATE_INTERVAL);
-    },
-    beforeDestroy() {
-        clearInterval(this.timer)
-    },
-    template: `<v-card elevation="18">
-                    <v-card-title class="headline justify-center text-uppercase">Chat</v-card-title>
-                    <v-card-text v-for="message in this.history">
-                        {{message.user}}: {{message.text}}
-                    </v-card-text>
-                    <v-card-text>
-                        <v-text-field label="Type a message" v-model="newMessage" outline color="grey"
-                            @keyup.enter="sendMessage()">
-                        </v-text-field>
-                        Current users:<span v-for="user in this.users"> {{user}}<span v-if="!isLast(user)">,</span></span>
-                    </v-card-text>
-                    <v-card-actions>
-                        <v-btn block @click="sendMessage()">send</v-btn>
-                    </v-card-actions>
-                </v-card>`
-}
-
-var UserSearch = {
-    name: 'UserSearch',
-    data: function () {
-        return {
             searchQuery: "",
-            users: [],
             selected: "",
-            timer: "",
         }
     },
     methods: {
-        getUsers: function (callback) {
-            fetch(`${url}/users`).then(function (res) {
-                res.json().then(function (data) {
-                    callback && callback(data.users)
-                });
-            });
-        },
-        updateData: function (newUsers) {
-            this.users = newUsers
+        sendMessage: function (message) {
+            this.newMessage = ""
+            if (message.text != "") {
+                fetch(`${url}/${this.route}/messaging`, {
+                    method: "POST",
+                    headers: {
+                        "Content-type": "application/json"
+                    },
+                    body: JSON.stringify({ message: message })
+                })
+            }
         },
         invite: function (name) {
             if (name != "") {
@@ -131,26 +80,42 @@ var UserSearch = {
                     body: JSON.stringify({ room: `${app.page}`, from: app.username })
                 })
             }
+        },
+        canInvite: function () {
+            if(app.roomData.maxPlayers && app.roomData.users.length == app.roomData.maxPlayers) {
+                return false
+            }
+            return app.getRoomHost(app.page) == app.username && app.page != 'home'
+        },
+        usersWithout: function () {
+            //Return all users but this user
+            return app.users.filter((user) => user != app.username)
         }
     },
-    mounted() {
-        this.getUsers(this.updateData)
-        this.timer = setInterval(() => {
-            this.getUsers(this.updateData)
-        }, UPDATE_INTERVAL);
-    },
-    beforeDestroy() {
-        clearInterval(this.timer)
-    },
-    template: `<v-card elevation="18">
-                    <v-subheader class="pa-0">Add User to Room</v-subheader>
-                    <v-autocomplete v-model="searchQuery" :items="users" no-data-text="No Users">
-                        <template v-slot:append-outer>
-                            <v-slide-x-reverse-transition mode="out-in">
-                            </v-slide-x-reverse-transition>
-                        </template>
-                    </v-autocomplete>
-                    <v-btn v-bind:disabled="searchQuery == '' || searchQuery == app.username" @click="invite(searchQuery)">Send Invite</v-btn>
+    template: `<v-card elevation="18" v-bind:color="app.primaryColor">
+                    <v-card-title class="font-weight-bold headline justify-center text-uppercase">Chat</v-card-title>
+                    <v-flex xs12 v-if="canInvite()" class="user-search" py-0 align-content-center>
+                        <p class="ma-0 mt-3">Add User</p>
+                        <v-autocomplete v-model="searchQuery" :items="usersWithout()" no-data-text="No Users" color="black" dense width="150px">
+                            <template v-slot:append-outer>
+                                <v-slide-x-reverse-transition mode="out-in">
+                                </v-slide-x-reverse-transition>
+                            </template>
+                        </v-autocomplete>
+                        <v-btn block v-bind:disabled="searchQuery == ''" @click="invite(searchQuery)" v-bind:color="app.secondaryColor">Invite</v-btn>
+                    </v-flex>
+                    <p class="messages" v-for="message in app.roomData.messageHistory">
+                        {{message.user}}: {{message.text}}
+                    </p>
+                    <v-card-text class="pb-0">
+                        <v-text-field label="Type a message" v-model="newMessage" outline color="grey"
+                            @keyup.enter="sendMessage({user: app.username, text: newMessage})">
+                        </v-text-field>
+                        Current users:<span v-for="user in app.roomData.users"> {{user}}<span v-if="!isLast(user, app.roomData.users)">,</span></span>
+                    </v-card-text>
+                    <v-card-actions>
+                        <v-btn block @click="sendMessage({user: app.username, text: newMessage})" v-bind:color="app.secondaryColor">send</v-btn>
+                    </v-card-actions>
                 </v-card>`
 }
 
@@ -158,18 +123,20 @@ var app = new Vue({
     el: "#app",
     components: {
         'messaging': Messaging,
-        'usersearch': UserSearch,
         'privateroomcategory': PrivateRoomCategory,
     },
 
     data: {
-        color: "deep-purple lighten-1",
+        primaryColor: "light-green darken-3",
+        secondaryColor: "light-green darken-1",
+        tertiaryColor: "light-green lighten-2",
         page: "login",
         publicRooms: [
             "home"
         ],
         games: [
-            "pictionary", 
+            "pictionary",
+            "tictactoe",
             "go"
         ],
         privateMessageRooms: {
@@ -182,12 +149,11 @@ var app = new Vue({
         badName: false,
         globalTimer: "",
         invites: [],
-        sidebars: [
-            "invite",
-            "chat"
-        ],
-        current_sidebar: "chat",
-        sidebar: false,
+        users: [],
+        roomData: {
+            messageHistory: [],
+            users: []
+        },
     },
 
     created: function () {
@@ -248,6 +214,7 @@ var app = new Vue({
                                     },
                                     body: JSON.stringify({ user: app.username })
                                 }).then(function () {
+                                    app.getRoomData("home")
                                     app.welcome = true
                                     app.page = "home"
 
@@ -255,6 +222,8 @@ var app = new Vue({
                                     app.globalTimer = setInterval(() => {
                                         app.getInvites()
                                         app.refreshLogin()
+                                        app.getRoomData(app.page)
+                                        app.getAllUsers()
                                     }, UPDATE_INTERVAL);
 
                                     //set personal chat room
@@ -272,6 +241,14 @@ var app = new Vue({
                     app.invites = data.invites
                 });
             })
+        },
+        formatInvite: function (invite) {
+            var from = this.getRoomHost(invite)
+            var type = this.getRoomType(invite)
+            if (type == "privateMessaging") {
+                return `${from} invited you to chat!`
+            }
+            return `${from} invited you to play ${type}!`
         },
         respondInvite: function (room, accepted) {
             //split room into host name and room type
@@ -299,13 +276,25 @@ var app = new Vue({
             })
         },
         createGameRoom: function (room) {
+            // set up game room
             var roomName = `${app.username}-${room}`
-            //set up game room
-            app.privateGameRooms[roomName] = {name: `${app.username}'s ${room}`}
-            //idk lol!
-            app.switchRoom(roomName)
+            app.privateGameRooms[roomName] = { name: `${app.username}'s ${room}` }
+
+            // delete old game room
+            fetch(`${url}/${app.username}-${room}/users`, {
+                method: "DELETE",
+                headers: {
+                    "Content-type": "application/json"
+                },
+            }).then(function () {
+                app.switchRoom(roomName)
+            })
         },
         switchRoom: function (room) {
+            // If this is the same page
+            if (room == app.page) {
+                return
+            }
             //set old route
             var route = app.page
 
@@ -329,81 +318,46 @@ var app = new Vue({
                 },
                 body: JSON.stringify({ user: app.username })
             }).then(function () {
-                app.page = room;
+                app.getRoomData(room)
                 app.welcome = false
             })
         },
-        getRoomHost(room){
+        getRoomHost(room) {
             var index = room.indexOf("-")
             var roomHost = room.substring(0, index)
             return roomHost
         },
-        getRoomType(room){
+        getRoomType(room) {
             var index = room.indexOf("-")
             var roomType = room.substring(index + 1, room.length)
             return roomType
         },
-        getMessages: function (route, callback) {
-            fetch(`${url}/${route}/messaging`).then(function (res) {
+        getRoomData: function (room) {
+            fetch(`${url}/${room}/data`).then(function (res) {
                 res.json().then(function (data) {
-                    callback && callback(data.history, data.users)
+                    app.roomData = data.data
+                    app.page = room;
                 });
             });
         },
-        sendMessage: function (route, message, callback) {
-            if (message.text != "") {
-                fetch(`${url}/${route}/messaging`, {
-                    method: "POST",
-                    headers: {
-                        "Content-type": "application/json"
-                    },
-                    body: JSON.stringify({ message: message })
-                }).then(function () {
-                    callback && app.getMessages(route, callback)
-                });
-            }
-        },
-        updateGame: function () {
-            fetch(`${url}/game`).then(function (res) {
+        getAllUsers: function () {
+            fetch(`${url}/users`).then(function (res) {
                 res.json().then(function (data) {
-                    app.characters = data.characters;
+                    app.users = data.users
                 });
             });
         },
-        gameMove: function (move) {
-            if (this.characterCreated) {
-                fetch(`${url}/game`, {
-                    method: "POST",
-                    headers: {
-                        "Content-type": "application/json"
-                    },
-                    body: JSON.stringify({ move: move, user: app.username })
-                }).then(function () {
-                    app.updateGame()
-                });
-            }
-        },
-        createCharacter: function () {
-            //set game timer
-            this.interval = setInterval(() => {
-                this.updateGame()
-            }, UPDATE_INTERVAL);
-
-            //create character for user
-            fetch(`${url}/game/login`, {
-                method: "POST",
-                headers: {
-                    "Content-type": "application/json"
-                },
-                body: JSON.stringify({ user: app.username, color: color })
-            }).then(function () {
-                app.characterCreated = true
-                app.updateGame()
-            });
-        }
     },
 
     computed: {
 
     }
 })
+
+
+// HELPER FUNCTIONS
+
+// See if user is last in list
+function isLast(user, list) {
+    return list[list.length - 1] == user
+}
