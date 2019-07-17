@@ -7,19 +7,20 @@
     <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900|Material+Icons" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/vuetify/dist/vuetify.min.css" rel="stylesheet">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+    <link href="https://fonts.googleapis.com/css?family=Signika&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <title>ROOMS</title>
 </head>
 
 <div id="app" v-cloak>
-    <v-app dark>
+    <v-app>
         <v-content>
 
             <!-- TOOLBAR -->
-            <v-toolbar fixed app color="color" v-if="page != 'login'">
-                <v-toolbar-title>Rooms</v-toolbar-title>
+            <v-toolbar fixed app v-bind:color="primaryColor" v-if="page != 'login'">
+                <v-toolbar-title>ROOMS</v-toolbar-title>
                 <v-spacer></v-spacer>
-                <v-toolbar-items>
+                <v-toolbar-items class="display-1">
                     <v-btn flat v-on:click="switchRoom('home')">HOME</v-btn>
                     <PrivateRoomCategory v-bind:title="'Messaging'" v-bind:type="'messages'"></PrivateRoomCategory>
                     <PrivateRoomCategory v-bind:title="'Game Rooms'" v-bind:type="'games'"></PrivateRoomCategory>
@@ -27,25 +28,25 @@
             </v-toolbar>
 
             <!-- WELCOME TEXT -->
-            <v-card-title class="display-1 justify-center" v-if="page != 'login' && welcome">Welcome {{username}}!
+            <v-card-title class="display-1 justify-center px-0 pb-0" v-if="page != 'login' && welcome">Welcome
+                {{username}}!
             </v-card-title>
 
-            <v-container>
-                <v-card-title v-if="page == 'login'" class="display-3 justify-center">WELCOME TO ROOMS</v-card-title>
-
-                <!-- LOGIN -->
+            <!-- LOGIN -->
+            <v-container v-if="page == 'login'">
+                <v-card-title class="display-3 justify-center">WELCOME TO ROOMS</v-card-title>
                 <v-layout v-if="page == 'login'">
                     <v-flex xs3></v-flex>
                     <v-flex xs6>
-                        <v-card id="login" elevation="18">
+                        <v-card id="login" elevation="18" v-bind:color="primaryColor">
                             <v-card-title class="display-1 justify-center">Enter a Username</v-card-title>
                             <v-card-text>
-                                <v-text-field label="name" v-model="testUsername" outline color="grey"
+                                <v-text-field label="name" v-model="testUsername" outline v-bind:color="secondaryColor"
                                     @keyup.enter="checkUsername()">
                                 </v-text-field>
                             </v-card-text>
                             <v-card-actions>
-                                <v-btn block @click="checkUsername()">enter</v-btn>
+                                <v-btn block @click="checkUsername()" v-bind:color="secondaryColor">enter</v-btn>
                             </v-card-actions>
                             <v-card-text v-if="badName" class="subheading text-xs-center red">That username is already
                                 taken</v-card-text>
@@ -53,36 +54,43 @@
                     </v-flex>
                     <v-flex xs3></v-flex>
                 </v-layout>
+            </v-container>
 
-                <!-- GLOBAL MESSAGING -->
-                <v-layout v-if="page == 'home'">
-                    <v-flex xs3>
-                        <v-card elevation="18">
+            <!-- HOME -->
+            <v-container v-if="page == 'home'" grid-list-xl fluid>
+                <v-layout>
+                    <v-flex xs3 pt-0>
+                        <v-card elevation="18" v-bind:color="primaryColor" class="list">
                             <v-card-title class="subheading justify-center">YOUR INVITES</v-card-title>
-                            <div v-for="invite in invites">
-                                <v-card-text>{{invite}}</v-card-text>
-                                <v-btn @click="respondInvite(invite, true)">Accept</v-btn>
-                                <v-btn @click="respondInvite(invite, false)">Decline</v-btn>
+                            <div v-for="invite in invites" class="text-xs-center" v-bind:color="tertiaryColor">
+                                <v-card-text>{{formatInvite(invite)}}</v-card-text>
+                                <v-btn @click="respondInvite(invite, true)" v-bind:color="secondaryColor">Accept</v-btn>
+                                <v-btn @click="respondInvite(invite, false)" v-bind:color="secondaryColor">Decline
+                                </v-btn>
                             </div>
                         </v-card>
                     </v-flex>
-                    <v-flex xs6>
+                    <v-flex xs6 px-4 mx-4 pt-0>
                         <v-card-title class="display-2 justify-center">HOME</v-card-title>
                         <Messaging v-bind:route="'home'" v-bind:key="1"></Messaging>
                     </v-flex>
-                    <v-flex xs3>
-                        <v-card elevation="18">
+                    <v-flex xs3 pt-0>
+                        <v-card elevation="18" v-bind:color="primaryColor" class="list">
                             <v-card-title class="subheading justify-center">Create Game Room</v-card-title>
-                            <div v-for="game in games">
-                                <v-card-text>{{game}}</v-card-text>
-                                <v-btn @click="createGameRoom(game)">Create</v-btn>
+                            <div v-for="game in games" class="text-xs-center" v-bind:color="tertiaryColor">
+                                <v-card-text class="center">{{game.toUpperCase()}}</v-card-text>
+                                <v-btn @click="createGameRoom(game)" v-bind:color="secondaryColor"
+                                    class="justify-center">Create</v-btn>
                             </div>
                         </v-card>
                     </v-flex>
                 </v-layout>
+            </v-container>
 
-                <!-- PRIVATE MESSAGING -->
-                <v-layout v-for="(room, index) in Object.keys(privateMessageRooms)" v-if="page == room">
+            <!-- PRIVATE MESSAGING -->
+            <v-container v-for="(room, index) in Object.keys(privateMessageRooms)" v-if="page == room" grid-list-xl
+                fluid>
+                <v-layout>
                     <v-flex xs3>
                         <UserSearch v-if="getRoomHost(room) == username"></UserSearch>
                     </v-flex>
@@ -92,60 +100,95 @@
                     </v-flex>
                     <v-flex xs3></v-flex>
                 </v-layout>
+            </v-container>
 
-                <!--GAMES-->
-                <v-layout justify-center>
-                    <v-flex xs8>
-                        <v-card v-for="(room, index) in Object.keys(privateGameRooms)" v-if="page == room">
-                            <v-card-title class="display-1 justify-center text-uppercase">
-                                {{privateGameRooms[room].name}}</v-card-title>
+            <!--GAMES-->
+            <v-container v-for="(room, index) in Object.keys(privateGameRooms)" v-if="page == room" grid-list-xl fluid>
+                <v-card-title class="display-1 justify-center text-uppercase">
+                    {{privateGameRooms[room].name}}</v-card-title>
 
-                            <!--Game Socalizing Bar-->
-                            <v-toolbar color="deep-purple lighten-1">
-                                <v-toolbar-items>
-                                    <v-btn flat @click="current_sidebar = 'invite'; sidebar = !sidebar;">
-                                        Invite</v-btn>
-                                    <v-btn flat @click="current_sidebar = 'chat'; sidebar = !sidebar;">
-                                        Chat</v-btn>
-                                </v-toolbar-items>
-                            </v-toolbar>
+                <v-layout>
 
-                            <!-- PICTIONARY -->
-                            <div v-if="getRoomType(room) == 'pictionary'">
-                                <!--Game Window-->
-                                <canvas id="pictionary" ref="canvas" v-canvas height="500px" width="500px"></canvas>
+                    <!-- PICTIONARY -->
+                    <v-flex xs8 v-if="getRoomType(room) == 'pictionary'">
+                        <!--Game Window-->
+                        <canvas id="pictionary" ref="canvas" v-canvas height="500px" width="500px"></canvas>
 
-                                <!--Game Statistics-->
-                                <v-card-text>
-                                    <span>It is Your Turn</span>
-                                    <span class="float: right">Score: 6</span>
-                                </v-card-text>
+                        <!--Game Statistics-->
+                        <v-card-text>
+                            <span>{{pictionary.seconds}}</span>
+                            <span v-if="pictionary.isTurn">It is Your Turn</span>
+                            <span class="float: right">Score: 6</span>
+                        </v-card-text>
 
-                                <!--Game Controls-->
-                                <v-card-text>
-                                    <v-btn v-if="getRoomHost(room) == username"
-                                        @click="pictionary.activatePictionary()">
-                                        Start</v-btn>
-                                    <v-btn v-if="getRoomHost(room) != username" @click="pictionary.ready()">Ready
-                                    </v-btn>
-                                    <v-select :items="pictionary.colors" v-model="pictionary.marker_color"></v-select>
-                                    <v-text-field v-if="!pictionary.isTurn" placeholder="What is this drawing?">
-                                    </v-text-field>
-                                </v-card-text>
+                        <!--Game Controls-->
+                        <v-card-text>
+                            <v-btn v-if="getRoomHost(room) == username" @click="pictionary.activatePictionary()">
+                                Start</v-btn>
+                            <v-btn v-if="getRoomHost(room) != username" @click="pictionary.ready()">Ready
+                            </v-btn>
+                            <v-select :items="pictionary.colors" v-model="pictionary.marker_color"></v-select>
+                            <v-text-field v-if="!pictionary.isTurn" placeholder="What is this drawing?">
+                            </v-text-field>
+                        </v-card-text>
+                    </v-flex>
+
+                    <!-- TIC TAC TOE -->
+                    <v-flex xs8 v-if="getRoomType(room) == 'tictactoe'">
+                        <!--Game Window-->
+                        <v-card elevation="18" v-bind:color="primaryColor">
+                            <v-card-title display-1 justify-center>Tic Tac Toe</v-card-title>
+                            <div id="board">
+                                <div v-for="(tile, index) in app.roomData.tiles" @click="tictactoe.selectTile(index)"
+                                    class="tile">
+                                    {{tile}}</div>
                             </div>
+                            <v-card-text id="winner"></v-card-text>
+                            <button v-if="app.roomData.winner != 'none'" @click="tictactoe.reset()">Play Again</button>
+
+                            <v-card-text class="text-xs-center" pa-0>
+                                <span v-if="app.roomData.started">Game has started!</span>
+                                <span v-if="!app.roomData.started">Game has not yet started</span>
+                                <span v-if="app.roomData.winner != 'none'"></span>
+                            </v-card-text>
+
+                            <!--Game Statistics-->
+                            <v-card-text>
+                                <span v-if="!app.roomData.started" class="float: left">Ready players: <span
+                                        v-for="player in Object.keys(app.roomData.players)"> {{player}}<span
+                                            v-if="!isLast(player, Object.keys(app.roomData.players))">,</span></span></span>
+                                <span v-if="app.roomData.started && app.roomData.turn.user == app.username">It is Your
+                                    Turn</span>
+                                <span v-if="app.roomData.started && app.roomData.turn.user != app.username">It is
+                                    {{app.roomData.turn.user}}'s turn</span>
+                                <div>
+                                    <v-card-text>SCORE</v-card-text>
+                                    <v-divider></v-divider>
+                                    <v-card-text v-for="player in Object.keys(app.roomData.players)">{{player}} Wins: {{app.roomData.players[player].score}}</v-card-text>
+                                </div>
+                            </v-card-text>
+
+                            <!--Game Controls-->
+                            <v-card-actions>
+                                <v-btn
+                                    v-if="!app.roomData.started && Object.keys(app.roomData.players).length == app.roomData.maxPlayers && app.getRoomHost(app.page) == app.username"
+                                    @click="tictactoe.start()">Start</v-btn>
+                                <v-btn v-if="!app.roomData.players[app.username]"
+                                    @click="tictactoe.readyUp()">Ready</v-btn>
+                                <v-btn v-if="app.roomData.winner != 'none' && app.getRoomHost(app.page) == app.username" @click="tictactoe.reset()">Play Again</v-btn>
+                            </v-card-actions>
 
                         </v-card>
                     </v-flex>
-                    <v-flex xs3 v-if="sidebar" justify-center>
-                        <v-card v-if="current_sidebar == 'invite'" color="white" height="635px" light>
-                            <UserSearch v-if="getRoomHost(room) == username"></UserSearch>
-                        </v-card>
-                        <v-card v-if="current_sidebar == 'chat'" color="white" height="635px" light>
+
+                    <!-- SIDEBAR -->
+                    <v-flex xs4>
+                        <v-card v-bind:color="secondaryColor">
                             <Messaging v-bind:route="room" v-bind:key="index"></Messaging>
                         </v-card>
                     </v-flex>
-                </v-layout>
 
+                </v-layout>
             </v-container>
         </v-content>
     </v-app>
@@ -155,6 +198,22 @@
 <script src="https://cdn.jsdelivr.net/npm/vuetify/dist/vuetify.js"></script>
 <script src="script.js"></script>
 <script src="games/pictionary.js"></script>
+<<<<<<< HEAD
 <script src="games/go.js"></script>
 
 </html>
+=======
+<script src="games/tictactoe.js"></script>
+
+</html>
+
+<!-- Game Socalizing Bar
+                        <v-toolbar v-bind:color="primaryColor">
+                            <v-toolbar-items>
+                                <v-btn flat @click="current_sidebar = 'invite'">
+                                    Invite</v-btn>
+                                <v-btn flat @click="current_sidebar = 'chat'">
+                                    Chat</v-btn>
+                            </v-toolbar-items>
+                        </v-toolbar> -->
+>>>>>>> 6eacdd627ad5ba40652ba3c1ea466c44ebe76c72

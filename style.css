@@ -2,12 +2,41 @@
     display: none;
 }
 
+html, body{
+    background-color: #DCEDC8;
+}
+
+#app {
+    background-color: #DCEDC8;
+    font-family: 'Signika', cursive;
+}
+
 #login {
     margin-top: calc(50vh - 250px);
 }
 
+.list :not(:first-child){
+    border-top: 2px solid #000;
+    background-color: #AED581;
+}
+
+.user-search {
+    display: flex;
+    flex-direction: row;
+    align-content: center;
+    background-color: #558B2F;
+    width: 80%;
+    margin: 0 auto;
+}
+
+.user-search p {
+    align-self: flex-start;
+    height: 50%;
+}
+
 .messages{
-    margin: 2px 5px 2px 5px;
+    margin: 2px 5px 2px 15px;
+    border-bottom: 0.5px solid #7CB342;
 }
 
 /* GAME STUFF */
@@ -22,4 +51,33 @@
 
 #pictionary {
     background-color: #FFF;
+}
+
+/* TIC TAC TOE */
+
+:root{
+    --box-size: 100px;
+}
+
+/* body{
+    text-align: center;
+    background-color: black;
+    color: white;
+    font-family: sans-serif;
+} */
+
+#board{
+    width: calc(3 * var(--box-size) + 12px);
+    height: calc(3 * var(--box-size) + 12px);
+    margin: auto;
+}
+
+.tile{
+    float: left;
+    width: var(--box-size);
+    height: var(--box-size);
+    border: 2px solid black;
+    font-size: 5rem;
+    color: black;
+    text-align: center;
 }
