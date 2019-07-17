@@ -9,7 +9,7 @@ var tictactoe = new Vue({
                 isX ? app.roomData.tiles[index] = "X" : app.roomData.tiles[index] = "O";
 
                 //send game info
-                this.sendGameInfo(app.roomData.tiles)
+                this.sendGameInfo()
             }
         },
         readyUp: function () {
@@ -36,12 +36,19 @@ var tictactoe = new Vue({
             })
         },
         reset: function () {
-            app.roomData.tiles.forEach(tile => {
-                tile = "";
-            });
+            app.roomData.tiles = [
+                "", "", "",
+                "", "", "",
+                "", "", "",
+            ]
             app.roomData.winner = "none"
             app.roomData.started = false
+
+            // Set starting user for next game
             app.roomData.turn = {user: "", turn: 0}
+            app.roomData.first++
+            app.roomData.first %= app.roomData.maxPlayers
+            app.roomData.turn.user = Object.keys(app.roomData.players)[app.roomData.first]
 
             this.sendGameInfo()
         },

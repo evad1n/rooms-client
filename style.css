@@ -79,5 +79,7 @@ html, body{
     border: 2px solid black;
     font-size: 5rem;
     color: black;
+    background-color: #AED581;
     text-align: center;
+    cursor: pointer;
 }

@@ -1,5 +1,5 @@
-//const url = 'https://server-rooms.herokuapp.com'
-const url = 'http://localhost:3000'
+const url = 'https://server-rooms.herokuapp.com'
+//const url = 'http://localhost:3000'
 
 const UPDATE_INTERVAL = 200
 
@@ -71,7 +71,6 @@ var Messaging = {
         },
         invite: function (name) {
             if (name != "") {
-                console.log(name, " will be invited to " + app.page)
                 fetch(`${url}/invites/${name}`, {
                     method: "POST",
                     headers: {
@@ -108,7 +107,7 @@ var Messaging = {
                         {{message.user}}: {{message.text}}
                     </p>
                     <v-card-text class="pb-0">
-                        <v-text-field label="Type a message" v-model="newMessage" outline color="grey"
+                        <v-text-field label="Type a message" v-model="newMessage" outline v-bind:color="app.secondaryColor"
                             @keyup.enter="sendMessage({user: app.username, text: newMessage})">
                         </v-text-field>
                         Current users:<span v-for="user in app.roomData.users"> {{user}}<span v-if="!isLast(user, app.roomData.users)">,</span></span>
@@ -118,7 +117,6 @@ var Messaging = {
                     </v-card-actions>
                 </v-card>`
 }
-
 
 
 //MAIN APP
