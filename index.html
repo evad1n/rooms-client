@@ -144,7 +144,6 @@
                                     {{tile}}</div>
                             </div>
                             <v-card-text id="winner"></v-card-text>
-                            <button v-if="app.roomData.winner != 'none'" @click="tictactoe.reset()">Play Again</button>
 
                             <v-card-text class="text-xs-center" pa-0>
                                 <span v-if="app.roomData.started">Game has started!</span>
@@ -164,7 +163,7 @@
                                 <div>
                                     <v-card-text>SCORE</v-card-text>
                                     <v-divider></v-divider>
-                                    <v-card-text v-for="player in Object.keys(app.roomData.players)">{{player}} Wins: {{app.roomData.players[player].score}}</v-card-text>
+                                    <v-card-text v-for="player in Object.keys(app.roomData.players)">{{player}}: {{app.roomData.players[player].score}}</v-card-text>
                                 </div>
                             </v-card-text>
 

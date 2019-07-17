@@ -41,6 +41,7 @@ var tictactoe = new Vue({
             });
             app.roomData.winner = "none"
             app.roomData.started = false
+            app.roomData.turn = {user: "", turn: 0}
 
             this.sendGameInfo()
         },

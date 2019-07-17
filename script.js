@@ -1,5 +1,5 @@
-const url = 'https://server-rooms.herokuapp.com'
-//const url = 'http://localhost:3000'
+//const url = 'https://server-rooms.herokuapp.com'
+const url = 'http://localhost:3000'
 
 const UPDATE_INTERVAL = 200
 
@@ -321,6 +321,7 @@ var app = new Vue({
                 },
                 body: JSON.stringify({ user: app.username })
             }).then(function () {
+                app.page = room;
                 app.getRoomData(room)
                 app.welcome = false
             })
@@ -339,7 +340,6 @@ var app = new Vue({
             fetch(`${url}/${room}/data`).then(function (res) {
                 res.json().then(function (data) {
                     app.roomData = data.data
-                    app.page = room;
                 });
             });
         },
