@@ -119,6 +119,9 @@ var Messaging = {
                 </v-card>`
 }
 
+
+
+//MAIN APP
 var app = new Vue({
     el: "#app",
     components: {
