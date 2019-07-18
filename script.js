@@ -1,5 +1,5 @@
-const url = 'https://server-rooms.herokuapp.com'
-//const url = 'http://localhost:3000'
+//const url = 'https://server-rooms.herokuapp.com'
+const url = 'http://localhost:3000'
 
 const UPDATE_INTERVAL = 200
 
@@ -52,8 +52,9 @@ var Messaging = {
     data: function () {
         return {
             newMessage: "",
-            searchQuery: "",
-            selected: "",
+            addSearchQuery: "",
+            removeSearchQuery: "",
+            height: 0
         }
     },
     methods: {
@@ -70,42 +71,70 @@ var Messaging = {
             }
         },
         invite: function (name) {
-            if (name != "") {
-                fetch(`${url}/invites/${name}`, {
-                    method: "POST",
-                    headers: {
-                        "Content-type": "application/json"
-                    },
-                    body: JSON.stringify({ room: `${app.page}`, from: app.username })
-                })
-            }
+            // invite user to room
+            fetch(`${url}/invites/${name}`, {
+                method: "POST",
+                headers: {
+                    "Content-type": "application/json"
+                },
+                body: JSON.stringify({ room: `${app.page}`, from: app.username })
+            })
+        },
+        remove: function (name) {
+            // remove user from room
+            fetch(`${url}/${app.page}/users`, {
+                method: "PUT",
+                headers: {
+                    "Content-type": "application/json"
+                },
+                body: JSON.stringify({ user: name })
+            })
         },
         canInvite: function () {
-            if(app.roomData.maxPlayers && app.roomData.users.length == app.roomData.maxPlayers) {
+            if (app.roomData.maxPlayers && app.roomData.users.length == app.roomData.maxPlayers) {
                 return false
             }
             return app.getRoomHost(app.page) == app.username && app.page != 'home'
         },
+        canRemove: function () {
+            return this.removableUsers().length > 0 && app.getRoomHost(app.page) == app.username
+        },
+        removableUsers: function () {
+            // Return all users in room but this user
+            return app.roomData.users.filter((user) => user != app.username)
+        },
         usersWithout: function () {
-            //Return all users but this user
+            // Return all users but this user
             return app.users.filter((user) => user != app.username)
-        }
+        },
     },
     template: `<v-card elevation="18" v-bind:color="app.primaryColor">
                     <v-card-title class="font-weight-bold headline justify-center text-uppercase">Chat</v-card-title>
                     <v-flex xs12 v-if="canInvite()" class="user-search" py-0 align-content-center>
                         <p class="ma-0 mt-3">Add User</p>
-                        <v-autocomplete v-model="searchQuery" :items="usersWithout()" no-data-text="No Users" color="black" dense width="150px">
+                        <v-autocomplete v-model="addSearchQuery" :items="usersWithout()" no-data-text="No Users" color="black" dense width="150px">
                             <template v-slot:append-outer>
                                 <v-slide-x-reverse-transition mode="out-in">
                                 </v-slide-x-reverse-transition>
                             </template>
                         </v-autocomplete>
-                        <v-btn block v-bind:disabled="searchQuery == ''" @click="invite(searchQuery)" v-bind:color="app.secondaryColor">Invite</v-btn>
+                        <v-btn block v-bind:disabled="addSearchQuery == ''" @click="invite(addSearchQuery)" v-bind:color="app.secondaryColor">Invite</v-btn>
                     </v-flex>
-                    <p class="messages" v-for="message in app.roomData.messageHistory">
-                        {{message.user}}: {{message.text}}
-                    </p>
+                    <v-flex xs12 v-if="canRemove()" class="user-search" py-0 align-content-center>
+                        <p class="ma-0 mt-3">Remove User</p>
+                        <v-autocomplete v-model="removeSearchQuery" :items="removableUsers()" no-data-text="No Users" color="black" dense width="150px">
+                            <template v-slot:append-outer>
+                                <v-slide-x-reverse-transition mode="out-in">
+                                </v-slide-x-reverse-transition>
+                            </template>
+                        </v-autocomplete>
+                        <v-btn block v-bind:disabled="removeSearchQuery == ''" @click="remove(removeSearchQuery)" v-bind:color="app.secondaryColor">Kick</v-btn>
+                    </v-flex>
+                    <div v-chat-scroll="{always: false, smooth: true}" v-if="app.roomData.messageHistory.length > 0" class="messages-container">
+                        <p v-for="(message, index) in app.roomData.messageHistory" :key="index">
+                            {{message.user}}: {{message.text}}
+                        </p>
+                    </div>
                     <v-card-text class="pb-0">
                         <v-text-field label="Type a message" v-model="newMessage" outline v-bind:color="app.secondaryColor"
                             @keyup.enter="sendMessage({user: app.username, text: newMessage})">
@@ -155,6 +184,7 @@ var app = new Vue({
             messageHistory: [],
             users: []
         },
+        offsetTop: 0
     },
 
     created: function () {
@@ -215,15 +245,15 @@ var app = new Vue({
                                     },
                                     body: JSON.stringify({ user: app.username })
                                 }).then(function () {
-                                    app.getRoomData("home")
                                     app.welcome = true
                                     app.page = "home"
+                                    app.getRoomData()
 
                                     // START GLOBAL INTERVAL
                                     app.globalTimer = setInterval(() => {
                                         app.getInvites()
                                         app.refreshLogin()
-                                        app.getRoomData(app.page)
+                                        app.getRoomData()
                                         app.getAllUsers()
                                     }, UPDATE_INTERVAL);
 
@@ -282,7 +312,7 @@ var app = new Vue({
             app.privateGameRooms[roomName] = { name: `${app.username}'s ${room}` }
 
             // delete old game room
-            fetch(`${url}/${app.username}-${room}/users`, {
+            fetch(`${url}/${roomName}/users`, {
                 method: "DELETE",
                 headers: {
                     "Content-type": "application/json"
@@ -296,23 +326,11 @@ var app = new Vue({
             if (room == app.page) {
                 return
             }
-            //set old route
-            var route = app.page
 
-            //remove user from old room
-            fetch(`${url}/${route}/users`, {
-                method: "PUT",
-                headers: {
-                    "Content-type": "application/json"
-                },
-                body: JSON.stringify({ user: app.username })
-            })
-
-            //set new route
-            route = room
+            var oldRoom = app.page
 
             //add user to new room
-            fetch(`${url}/${route}/users`, {
+            fetch(`${url}/${room}/users`, {
                 method: "POST",
                 headers: {
                     "Content-type": "application/json"
@@ -320,8 +338,17 @@ var app = new Vue({
                 body: JSON.stringify({ user: app.username })
             }).then(function () {
                 app.page = room;
-                app.getRoomData(room)
+                app.getRoomData()
                 app.welcome = false
+
+                //remove user from old room
+                fetch(`${url}/${oldRoom}/users`, {
+                    method: "PUT",
+                    headers: {
+                        "Content-type": "application/json"
+                    },
+                    body: JSON.stringify({ user: app.username })
+                })
             })
         },
         getRoomHost(room) {
@@ -334,10 +361,24 @@ var app = new Vue({
             var roomType = room.substring(index + 1, room.length)
             return roomType
         },
-        getRoomData: function (room) {
-            fetch(`${url}/${room}/data`).then(function (res) {
+        getRoomData: function () {
+            fetch(`${url}/${app.page}/data`).then(function (res) {
                 res.json().then(function (data) {
                     app.roomData = data.data
+                    app.roomData.players = {}
+
+                    //send user to home page if they are in a room they shouldn't be in
+                    if (!app.roomData.users.includes(app.username)) {
+                        // remove room from list of available rooms for user
+                        if (app.privateMessageRooms[app.page]) {
+                            delete app.privateMessageRooms[app.page]
+                        }
+                        if (app.privateGameRooms[app.page]) {
+                            delete app.privateGameRooms[app.page]
+                        }
+
+                        app.switchRoom('home')
+                    }
                 });
             });
         },
@@ -362,3 +403,37 @@ var app = new Vue({
 function isLast(user, list) {
     return list[list.length - 1] == user
 }
+
+{/* <div v-if="app.roomData.messageHistory.length > 0" class="messages-container">
+<v-layout column justify-center align-center>
+    <v-subheader>Offset Top</v-subheader>
+    {{ offsetTop }}
+</v-layout>
+<v-container
+id="scroll-target"
+style="max-height: 400px"
+class="scroll-y"
+>
+    <v-layout
+        v-scroll:#scroll-target="onScroll"
+        column
+        align-center
+        justify-center
+    >
+    </v-layout>
+</v-container>
+<v-btn @click="scroll()">scroll</v-btn>
+<p v-for="(message, index) in app.roomData.messageHistory" v-bind:id="getId(index)">
+    {{message.user}}: {{message.text}}
+</p>
+</div>
+<v-card-text class="pb-0">
+<v-text-field label="Type a message" v-model="newMessage" outline v-bind:color="app.secondaryColor"
+    @keyup.enter="sendMessage({user: app.username, text: newMessage})">
+</v-text-field>
+Current users:<span v-for="user in app.roomData.users"> {{user}}<span v-if="!isLast(user, app.roomData.users)">,</span></span>
+</v-card-text>
+<v-card-actions>
+<v-btn block @click="sendMessage({user: app.username, text: newMessage})" v-bind:color="app.secondaryColor">send</v-btn>
+</v-card-actions>
+</v-card>` */}

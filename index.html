@@ -18,12 +18,16 @@
 
             <!-- TOOLBAR -->
             <v-toolbar fixed app v-bind:color="primaryColor" v-if="page != 'login'">
-                <v-toolbar-title>ROOMS</v-toolbar-title>
+                <v-toolbar-title id="title">ROOMS</v-toolbar-title>
+                <v-toolbar-title>{{app.username}}</v-toolbar-title>
                 <v-spacer></v-spacer>
                 <v-toolbar-items class="display-1">
                     <v-btn flat v-on:click="switchRoom('home')">HOME</v-btn>
+                    <div class="toolbar-divider"></div>
                     <PrivateRoomCategory v-bind:title="'Messaging'" v-bind:type="'messages'"></PrivateRoomCategory>
+                    <div class="toolbar-divider"></div>
                     <PrivateRoomCategory v-bind:title="'Game Rooms'" v-bind:type="'games'"></PrivateRoomCategory>
+                    <div class="toolbar-divider"></div>
                 </v-toolbar-items>
             </v-toolbar>
 
@@ -136,7 +140,7 @@
                     <!-- TIC TAC TOE -->
                     <v-flex xs8 v-if="getRoomType(room) == 'tictactoe'">
                         <!--Game Window-->
-                        <v-card elevation="18" v-bind:color="primaryColor">
+                        <v-card height="606.8px" elevation="18" v-bind:color="primaryColor">
                             <v-card-title display-1 justify-center>Tic Tac Toe</v-card-title>
                             <div id="board">
                                 <div v-for="(tile, index) in app.roomData.tiles" @click="tictactoe.selectTile(index)"
@@ -146,9 +150,13 @@
                             <v-card-text id="winner"></v-card-text>
 
                             <v-card-text class="text-xs-center" pa-0>
-                                <span v-if="app.roomData.started && app.roomData.winner == 'none'">Game has started!</span>
-                                <span v-if="!app.roomData.started && app.roomData.winner == 'none'">Game has not yet started</span>
-                                <span v-if="app.roomData.winner != 'none'">{{app.roomData.winner}} Wins!</span>
+                                <span v-if="app.roomData.started && app.roomData.winner == 'none'">Game has
+                                    started!</span>
+                                <span v-if="!app.roomData.started">Game has not yet started</span>
+                                <span
+                                    v-if="app.roomData.winner != 'none' && app.roomData.winner != 'tie'">{{app.roomData.winner}}
+                                    Wins!</span>
+                                <span v-if="app.roomData.winner == 'tie'">It's a tie!</span>
                             </v-card-text>
 
                             <!--Game Statistics-->
@@ -162,10 +170,14 @@
                                 </span>
 
                                 <div>
-                                    <span v-if="app.roomData.started && app.roomData.turn.user == app.username && app.roomData.winner == 'none'">It is
+                                    <span
+                                        v-if="app.roomData.started && app.roomData.turn.user == app.username && app.roomData.winner == 'none'">It
+                                        is
                                         Your
                                         Turn</span>
-                                    <span v-if="app.roomData.started && app.roomData.turn.user != app.username && app.roomData.winner == 'none'">It is
+                                    <span
+                                        v-if="app.roomData.started && app.roomData.turn.user != app.username && app.roomData.winner == 'none'">It
+                                        is
                                         {{app.roomData.turn.user}}'s turn</span>
                                 </div>
 
@@ -182,7 +194,8 @@
                                 <v-btn
                                     v-if="!app.roomData.started && Object.keys(app.roomData.players).length == app.roomData.maxPlayers && app.getRoomHost(app.page) == app.username"
                                     @click="tictactoe.start()" v-bind:color="secondaryColor" block>Start</v-btn>
-                                <v-btn v-if="!app.roomData.players[app.username]" @click="tictactoe.readyUp()" v-bind:color="secondaryColor" block>Ready
+                                <v-btn v-if="!app.roomData.players[app.username]" @click="tictactoe.readyUp()"
+                                    v-bind:color="secondaryColor" block>Ready
                                 </v-btn>
                                 <v-btn v-if="app.roomData.winner != 'none' && app.getRoomHost(app.page) == app.username"
                                     @click="tictactoe.reset()" v-bind:color="secondaryColor" block>Play Again</v-btn>
@@ -206,6 +219,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/vue"></script>
 <script src="https://cdn.jsdelivr.net/npm/vuetify/dist/vuetify.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue-chat-scroll/dist/vue-chat-scroll.min.js"></script>
 <script src="script.js"></script>
 <script src="games/pictionary.js"></script>
 <script src="games/tictactoe.js"></script>

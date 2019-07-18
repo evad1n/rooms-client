@@ -2,10 +2,6 @@
     display: none;
 }
 
-html, body{
-    background-color: #DCEDC8;
-}
-
 #app {
     background-color: #DCEDC8;
     font-family: 'Signika', cursive;
@@ -15,8 +11,21 @@ html, body{
     margin-top: calc(50vh - 250px);
 }
 
-.list :not(:first-child){
-    border-top: 2px solid #000;
+#title {
+    padding-right: 20px;
+    padding-top: 18px;
+    border-right: solid 2px rgba(0,0,0,.54);
+    height: 100%;
+}
+
+.toolbar-divider {
+    background-color: rgba(0,0,0,.54);
+    width: 2.5px;
+    height: 100%;
+}
+
+.list > div:not(:first-child){
+    border-top: 2px solid rgba(0,0,0,.54);
     background-color: #AED581;
 }
 
@@ -34,9 +43,54 @@ html, body{
     height: 50%;
 }
 
-.messages{
-    margin: 2px 5px 2px 15px;
+.messages-container {
+    border-radius: 5px;
+    border: 2px solid rgba(0,0,0,.54);
+    overflow-y: auto;
+    overflow-wrap: break-word;
+    max-height: 300px;
+    width: 95%;
+    margin: 0 auto;
+}
+
+::-webkit-scrollbar { width: 0 important }
+
+.messages-container p{
+    margin: 2px 5px 2px 8px;
+}
+
+.messages-container p:not(:last-child){
     border-bottom: 0.5px solid #7CB342;
+}
+
+
+/* ################## SCROLLBAR ######################## */
+::-webkit-scrollbar {
+    width: 15px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+    background: #DCEDC8; 
+    border-radius: 3px;
+}
+
+.messages-container::-webkit-scrollbar-track {
+    background: #7CB342; 
+    box-shadow: inset 0 0 5px rgb(33, 48, 17); 
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: #558B2F; 
+    border-radius: 3px;
+    border: 0.5px solid black;
+    border-right: none;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+    background: rgb(50, 82, 27); 
 }
 
 /* GAME STUFF */

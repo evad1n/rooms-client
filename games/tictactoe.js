@@ -45,10 +45,10 @@ var tictactoe = new Vue({
             app.roomData.started = false
 
             // Set starting user for next game
-            app.roomData.turn = {user: "", turn: 0}
             app.roomData.first++
             app.roomData.first %= app.roomData.maxPlayers
             app.roomData.turn.user = Object.keys(app.roomData.players)[app.roomData.first]
+            app.roomData.turn.turn = app.roomData.first
 
             this.sendGameInfo()
         },
