@@ -8,6 +8,8 @@ var pX = 0;
 var pZ = 0;
 var pMesh = null;
 
+var pafjkjaf = 9;
+
 var players = [
     {
         username: "James",
