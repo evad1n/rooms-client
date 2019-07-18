@@ -4,6 +4,8 @@ var pRotation = { x: 0, y: 0, z: 0 };
 var pColor = 0xFFFFFF;
 var pAmount = 25;
 var pSavedAmount = 0;
+var pX = 0;
+var pZ = 0;
 var pMesh = null;
 
 var players = [
@@ -45,7 +47,7 @@ var material = new THREE.MeshBasicMaterial({color: 0xAAAA00});
 var mesh = new THREE.Mesh(geometry,material);
 scene.add(mesh);
 
-/*var spaceArray = [
+var spaceArray = [
     new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load('images/outerspaceFT.png'), side: THREE.BackSide }),
     new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load('images/outerspaceBK.png'), side: THREE.BackSide }),
     new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load('images/outerspaceUP.png'), side: THREE.BackSide }),
@@ -54,9 +56,11 @@ scene.add(mesh);
     new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load('images/outerspaceLF.png'), side: THREE.BackSide })
 ]
 
+//HI
+
 var spaceGeometry = new THREE.BoxGeometry(10000, 10000, 10000);
 var space = new THREE.Mesh(spaceGeometry, spaceArray);
-scene.add(space);*/
+scene.add(space);
 
 var camera = new THREE.PerspectiveCamera(75, w_width / w_height, 0.1, 25000);
 
@@ -66,7 +70,7 @@ document.body.appendChild(renderer.domElement);
 
 var controls = new THREE.OrbitControls(camera, renderer.domElement);
 controls.enablePan = false;
-controls.minDistance = Math.sqrt(pAmount) * 2;
+controls.minDistance = Math.sqrt(pAmount) * 3;
 controls.maxDistance = Math.sqrt(pAmount) * 5;
 
 
@@ -81,13 +85,13 @@ window.addEventListener('resize', function () {
 
 window.addEventListener('keydown', function (e) {
     if (e.which == 38) {
-        pPosition.x += 1;
+        pX += 1;
     } else if (e.which == 39) {
-        pPosition.z += 1;
+        pX -= 1;
     } else if (e.which == 37) {
-        pPosition.z -= 1;
+        pZ += 1;
     } else if (e.which == 40) {
-        pPosition.x -= 1;
+        pZ -= 1;
     }
 })
 
@@ -157,9 +161,17 @@ var updatePlayer = function () {
 
     pMesh.rotation.set(pRotation.x, pRotation.y, pRotation.z);
     pMesh.position.set(pPosition.x, pPosition.y, pPosition.z);
+
+    //GROW
     pAmount += pSavedAmount/30;
     pSavedAmount -= pSavedAmount/30;
     pMesh.scale.set(Math.sqrt(pAmount), Math.sqrt(pAmount), Math.sqrt(pAmount));
+
+    pPosition.x += pX/30;
+    pX -= pX/30;
+    pPosition.z += pZ/30;
+    pZ -= pZ/30;
+    pMesh.position.set(pPosition.x,pPosition.y,pPosition.z);
 
     players.forEach(function (player) {
         devour(player);
