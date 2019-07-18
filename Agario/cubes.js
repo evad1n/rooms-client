@@ -44,11 +44,6 @@ var w_height = window.innerHeight;
 var scene = new THREE.Scene();
 scene.background = new THREE.Color(0x000000);
 
-var geometry = new THREE.BoxGeometry(2,16,2);
-var material = new THREE.MeshBasicMaterial({color: 0xAAAA00});
-var mesh = new THREE.Mesh(geometry,material);
-scene.add(mesh);
-
 var spaceArray = [
     new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load('images/outerspaceRT.png'), side: THREE.BackSide }),
     new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load('images/outerspaceLF.png'), side: THREE.BackSide }),
