@@ -83,14 +83,6 @@ window.addEventListener('keydown', function (e) {
         pX -= 1;
     } else if (e.which == 83) {
         pX += 1;
-    } else if (e.which == 32) {
-        pY += 1;
-    } else if (e.which == 67) {
-        pY -= 1;
-    } else if (e.which == 68) {
-        pZ += 1;
-    } else if (e.which == 65) {
-        pZ -= 1;
     }
 })
 
@@ -196,12 +188,6 @@ var devour = function (other) {
         //pPosition.x += pX / 30;
         pX -= pX / 30;
         pMesh.translateZ(pX/30);
-        //pPosition.y += pY / 30;
-        pY -= pY / 30;
-        pMesh.translateY(pY/30);
-        //pPosition.z += pZ / 30;
-        pZ -= pZ / 30;
-        pMesh.translateX(pZ/30);
         pPosition = pMesh.position;
         //END
 
