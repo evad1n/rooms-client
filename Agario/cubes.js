@@ -213,8 +213,11 @@ var devour = function (other) {
                 scene.remove(asteroid.mesh);
                 asteroid.mesh.geometry.dispose();
                 asteroid.mesh.material.dispose();
+                asteroid = null;
             }
-            asteroid = null;
+            asteroid.mesh.rotation.x += Math.random() - Math.random();
+            asteroid.mesh.rotation.y += Math.random() - Math.random();
+            asteroid.mesh.rotation.z += Math.random() - Math.random();
         })
     }
 
