@@ -148,7 +148,7 @@ mtlLoader.load('models/raptor.mtl', function (materials) {
 //UPDATE
 var createPlayer = function () {
     var geometry = new THREE.SphereGeometry(1, 32, 32);
-    var material = new THREE.MeshPhongMaterial({ color: pColor, wireframe: true });
+    var material = new THREE.MeshPhongMaterial({color: pColor});
     pMesh = new THREE.Mesh(geometry, material);
     pMesh.scale.set(Math.sqrt(pAmount), Math.sqrt(pAmount), Math.sqrt(pAmount));
     scene.add(pMesh);
