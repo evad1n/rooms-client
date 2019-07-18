@@ -50,12 +50,12 @@ var mesh = new THREE.Mesh(geometry,material);
 scene.add(mesh);
 
 var spaceArray = [
-    new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load('images/outerspaceLF.png'), side: THREE.BackSide }),
     new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load('images/outerspaceRT.png'), side: THREE.BackSide }),
+    new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load('images/outerspaceLF.png'), side: THREE.BackSide }),
     new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load('images/outerspaceUP.png'), side: THREE.BackSide }),
     new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load('images/outerspaceDN.png'), side: THREE.BackSide }),
-    new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load('images/outerspaceBK.png'), side: THREE.BackSide }),
-    new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load('images/outerspaceFT.png'), side: THREE.BackSide })
+    new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load('images/outerspaceFT.png'), side: THREE.BackSide }),
+    new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load('images/outerspaceBK.png'), side: THREE.BackSide })
 ]
 
 //HI
