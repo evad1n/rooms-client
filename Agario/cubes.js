@@ -1,7 +1,6 @@
 var pUsername = "Antoine";
 var pPosition = { x: 0, y: 0, z: 0 };
 var pRotation = { x: 0, y: 0, z: 0 };
-var pColor = 0x000000;
 var pAmount = 36;
 var pSavedAmount = 0;
 var pAlive = true;
@@ -10,30 +9,33 @@ var pY = 0;
 var pZ = 0;
 var pMesh = null;
 var pRing = null;
-var pRingRotation = 0;
+var pRingColor = 0x000000;
 var pInterval = 30;
 
 var players = [
     {
         username: "James",
         position: { x: 5, y: 0, z: -32 },
-        color: 0xFF0000,
+        ringcolor: 0xFF0000,
         amount: 47,
-        alive: true
+        alive: true,
+        ringrotation: 0
     },
     {
         username: "Japmes",
         position: { x: -19, y: 0, z: 0 },
-        color: 0x00FF00,
+        ringcolor: 0x00FF00,
         amount: 16,
-        alive: true
+        alive: true,
+        ringrotation: 0
     },
     {
         username: "Jamppes",
         position: { x: 1, y: 0, z: 16 },
-        color: 0xFF00FF,
+        ringcolor: 0xFF00FF,
         amount: 9,
-        alive: true
+        alive: true,
+        ringrotation: 0
     },
 ];
 
@@ -278,11 +280,20 @@ var updatePlayers = function () {
         //Mesh Creation
         if (player.alive) {
             var geometry = new THREE.SphereGeometry(1, 32, 32);
-            var material = new THREE.MeshPhongMaterial({ color: player.color });
+            var material = new THREE.MeshStandardMaterial({roughness: 0,metalness: 1,envMap: scene.background});
             player.mesh = new THREE.Mesh(geometry, material);
             player.mesh.position.set(player.position.x, player.position.y, player.position.z);
             player.mesh.scale.set(Math.sqrt(player.amount), Math.sqrt(player.amount), Math.sqrt(player.amount));
             scene.add(player.mesh);
+            
+            
+            var material = new THREE.MeshBasicMaterial({ color: player.ringcolor, map: new THREE.TextureLoader().load('images/ring.png'), side: THREE.DoubleSide, alphaTest: 0, transparent: true, opacity: 1, blending: THREE.AdditiveBlending });
+            var geometry = new THREE.PlaneGeometry(1, 1, 1);
+            player.ring = new THREE.Mesh(geometry, material);
+            player.ring.position.set(player.position.x,player.position.y,player.position.z);
+            player.ringrotation -= 1;
+            player.ring.rotation.set(0,0,ringrotation);
+            scene.add(player.ring);
         }
     })
 }
