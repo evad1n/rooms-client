@@ -273,8 +273,6 @@ var clearPlayers = function () {
         player.mesh.geometry.dispose();
         player.mesh.material.dispose();
         scene.remove(player.ring);
-        player.ring.geometry.dispose();
-        player.ring.material.dispose();
     })
 }
 
