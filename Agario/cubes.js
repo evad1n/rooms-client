@@ -127,7 +127,6 @@ var spaceArray = [
 var createSkyBox = function () {
     var spaceGeometry = new THREE.BoxGeometry(2500, 2500, 2500);
     pSpace = new THREE.Mesh(spaceGeometry, spaceArray);
-    pSpace.format = THREE.RGBFormat;
     scene.add(pSpace);
 }
 
