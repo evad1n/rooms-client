@@ -221,7 +221,7 @@ var createPlayer = function () {
     var geometry = new THREE.SphereGeometry(1, 32, 32);
     var material = new THREE.MeshStandardMaterial({
         roughness: 0,
-        envMap: mirrorSphereCamera.texture
+        envMap: scene.background
     });
     
     pMesh = new THREE.Mesh(geometry, mirrorSphereMaterial);
