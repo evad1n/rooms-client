@@ -132,7 +132,7 @@ var createSkyBox = function () {
 
 mirrorSphereCamera = new THREE.CubeCamera( 0.1, 5000, 512 );
 scene.add( mirrorSphereCamera );
-var mirrorSphereMaterial = new THREE.MeshBasicMaterial( { envMap: mirrorSphereCamera.renderTarget } );
+var mirrorSphereMaterial = new THREE.MeshBasicMaterial( { envMap: mirrorSphereCamera.texture } );
 
 var createSun = function () {
     var sun = new THREE.DirectionalLight(0xffffff);
