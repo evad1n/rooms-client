@@ -45,7 +45,7 @@ var starAmount = 100;
 var stars = [];
 
 var scene = new THREE.Scene();
-scene.background = new THREE.Color(0x000000);
+scene.background = new THREE.CubeTextureLoader().setPath('images/').load(['images/outerspace_left.png','images/outerspace_right.png','images/outerspace_up.png','images/outerspace_down.png','images/outerspace_front.png','images/outerspace_back.png'])
 
 
 
@@ -115,21 +115,6 @@ var randomColor = function () {
     return color;
 }
 
-var spaceArray = [
-   new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load('images/outerspace_left.png'), side: THREE.BackSide }),
-   new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load('images/outerspace_right.png'), side: THREE.BackSide }),
-   new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load('images/outerspace_up.png'), side: THREE.BackSide }),
-   new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load('images/outerspace_down.png'), side: THREE.BackSide }),
-   new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load('images/outerspace_front.png'), side: THREE.BackSide }),
-   new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load('images/outerspace_back.png'), side: THREE.BackSide })
-]
-
-var createSkyBox = function () {
-    var spaceGeometry = new THREE.BoxGeometry(2500, 2500, 2500);
-    pSpace = new THREE.Mesh(spaceGeometry, spaceArray);
-    scene.add(pSpace);
-}
-
 var createSun = function () {
     var sun = new THREE.DirectionalLight(0xffffff);
     sun.position.set(1, 1, 1).normalize();
@@ -192,7 +177,6 @@ var createStar = function () {
 }
 
 var createScene = function () {
-    createSkyBox();
     createSun();
     createAmbientLight();
     createAsteroids();
