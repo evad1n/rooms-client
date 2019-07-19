@@ -244,7 +244,7 @@ var updatePlayer = function () {
     pRotation.z = camera.rotation.z;
 
     pMesh.rotation.set(pRotation.x, pRotation.y, pRotation.z);
-    pRing.rotation.z += 0.001;
+    pRing.rotation.z -= 0.001;
     pRing.scale.set(pMesh.scale.x * 7, pMesh.scale.x * 7, pMesh.scale.x * 7);
 
     //GROW
