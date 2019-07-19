@@ -272,7 +272,6 @@ var clearPlayers = function () {
         scene.remove(player.mesh);
         player.mesh.geometry.dispose();
         player.mesh.material.dispose();
-        scene.remove(player.ring);
     })
 }
 
@@ -287,15 +286,14 @@ var updatePlayers = function () {
             player.mesh.scale.set(Math.sqrt(player.amount), Math.sqrt(player.amount), Math.sqrt(player.amount));
             scene.add(player.mesh);
             
-            
-            var material = new THREE.MeshBasicMaterial({ color: player.ringcolor, map: new THREE.TextureLoader().load('images/ring.png'), side: THREE.DoubleSide, alphaTest: 0, transparent: true, opacity: 1, blending: THREE.AdditiveBlending });
-            var geometry = new THREE.PlaneGeometry(1, 1, 1);
-            player.ring = new THREE.Mesh(geometry, material);
-            player.ring.position.set(player.position.x,player.position.y,player.position.z);
-            player.ringrotation.z += 0.001;
-            player.ring.rotation.set(player.ringrotation.x,player.ringrotation.y,player.ringrotation.z);
-            player.ring.scale.set(Math.sqrt(player.amount) * 7, Math.sqrt(player.amount) * 7, Math.sqrt(player.amount) * 7);
-            scene.add(player.ring);
+            //var material = new THREE.MeshBasicMaterial({ color: player.ringcolor, map: new THREE.TextureLoader().load('images/ring.png'), side: THREE.DoubleSide, alphaTest: 0, transparent: true, opacity: 1, blending: THREE.AdditiveBlending });
+            //var geometry = new THREE.PlaneGeometry(1, 1, 1);
+            //player.ring = new THREE.Mesh(geometry, material);
+            //player.ring.position.set(player.position.x,player.position.y,player.position.z);
+            //player.ringrotation.z += 0.001;
+            //player.ring.rotation.set(player.ringrotation.x,player.ringrotation.y,player.ringrotation.z);
+            //player.ring.scale.set(Math.sqrt(player.amount) * 7, Math.sqrt(player.amount) * 7, Math.sqrt(player.amount) * 7);
+            //scene.add(player.ring);
         }
     })
 }
