@@ -11,7 +11,6 @@ var pZ = 0;
 var pMesh = null;
 var pRing = null;
 var pRingRotation = 0;
-var pSpace = null;
 var pInterval = 30;
 
 var players = [
@@ -257,7 +256,6 @@ var updatePlayer = function () {
     pMesh.translateZ(pX / pInterval);
     pRing.translateZ(pX / pInterval);
     pPosition = pMesh.position;
-    pSpace.position.set(pPosition.x,pPosition.y,pPosition.z);
 
     players.forEach(function (player) {
         devour(player);
