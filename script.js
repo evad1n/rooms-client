@@ -1,5 +1,5 @@
-const url = 'https://server-rooms.herokuapp.com'
-// const url = 'http://localhost:3000'
+// const url = 'https://server-rooms.herokuapp.com'
+const url = 'http://localhost:3000'
 
 const UPDATE_INTERVAL = 200
 
@@ -8,29 +8,26 @@ var PrivateRoomCategory = {
     props: ['type', 'title'],
     data: function () {
         return {
-            rooms: {},
-            timer: "",
+
         }
     },
     methods: {
-        updateRooms: function () {
-            if (this.type == 'messages') {
-                this.rooms = app.privateMessageRooms
-            } else {
-                this.rooms = app.privateGameRooms
+        isType: function (room) {
+            var roomType = app.getRoomType(room)
+
+            // if not a public room
+            if (!app.rooms.includes(roomType)) {
+                // if messaging
+                if (roomType == 'privateMessaging' && this.type == 'messages') {
+                    return true
+                }
+                if (roomType != 'privateMessaging' && this.type == 'games') {
+                    return true
+                }
             }
-            //otherwise won't update rooms list
-            this.$forceUpdate()
-        }
-    },
-    mounted() {
-        this.updateRooms()
-        this.timer = setInterval(() => {
-            this.updateRooms()
-        }, UPDATE_INTERVAL);
-    },
-    beforeDestroy() {
-        clearInterval(this.timer)
+
+            return false
+        },
     },
     template: `<v-menu offset-y>
                     <template v-slot:activator="{ on }">
@@ -39,8 +36,8 @@ var PrivateRoomCategory = {
                         </v-btn>
                     </template>
                     <v-list>
-                        <v-list-tile v-for="(room, index) in Object.keys(this.rooms)" :key="index" @click="app.switchRoom(room)">
-                            <v-list-tile-title>{{ rooms[room].name }}</v-list-tile-title>
+                        <v-list-tile v-for="(room, index) in app.rooms.filter(isType)" :key="index" @click="app.switchRoom(room)">
+                            <v-list-tile-title>{{app.getRoomName(room)}}</v-list-tile-title>
                         </v-list-tile>
                     </v-list>
                 </v-menu>`
@@ -54,7 +51,11 @@ var Messaging = {
             newMessage: "",
             addSearchQuery: "",
             removeSearchQuery: "",
-            height: 0
+            height: 0,
+            invitableUsers: [],
+            canRemove: false,
+            removableUsers: [],
+            timer: null,
         }
     },
     methods: {
@@ -83,7 +84,7 @@ var Messaging = {
         remove: function (name) {
             // remove user from room
             fetch(`${url}/${app.page}/users`, {
-                method: "PUT",
+                method: "DELETE",
                 headers: {
                     "Content-type": "application/json"
                 },
@@ -96,33 +97,49 @@ var Messaging = {
             }
             return app.getRoomHost(app.page) == app.username && app.page != 'home'
         },
-        canRemove: function () {
-            return this.removableUsers().length > 0 && app.getRoomHost(app.page) == app.username
+        getData: function (callback) {
+            var invitableUsers, canRemove, removableUsers
+            fetch(`${url}/users`).then(function (res) {
+                res.json().then(function (data) {
+                    // Return all users with access to this room but this user
+                    removableUsers = Object.keys(data.users).filter((user) => data.users[user].rooms.includes(app.page) && user != app.username)
+                    // Return all users without access to this room
+                    invitableUsers = Object.keys(data.users).filter((user) => !data.users[user].rooms.includes(app.page))
+                    canRemove = removableUsers.length > 0 && app.getRoomHost(app.page) == app.username
+                    callback(invitableUsers, canRemove, removableUsers)
+                });
+            })
         },
-        removableUsers: function () {
-            // Return all users in room but this user
-            return app.roomData.users.filter((user) => user != app.username)
-        },
-        usersWithout: function () {
-            // Return all users but this user
-            return app.users.filter((user) => user != app.username)
-        },
+        updateData: function (invitableUsers, canRemove, removableUsers) {
+            this.invitableUsers = invitableUsers
+            this.canRemove = canRemove
+            this.removableUsers = removableUsers
+        }
+    },
+    mounted() {
+        this.getData(this.updateData)
+        this.timer = setInterval(() => {
+            this.getData(this.updateData)
+        }, UPDATE_INTERVAL);
+    },
+    beforeDestroy() {
+        clearInterval(this.timer)
     },
     template: `<v-card elevation="18" v-bind:color="app.primaryColor">
                     <v-card-title class="font-weight-bold headline justify-center text-uppercase">Chat</v-card-title>
                     <v-flex xs12 v-if="canInvite()" class="user-search" py-0 align-content-center>
                         <p class="ma-0 mt-3">Add User</p>
-                        <v-autocomplete v-model="addSearchQuery" :items="usersWithout()" no-data-text="No Users" color="black" dense width="150px">
+                        <v-autocomplete v-model="addSearchQuery" :items="invitableUsers" no-data-text="No Users" color="black" dense width="150px">
                             <template v-slot:append-outer>
                                 <v-slide-x-reverse-transition mode="out-in">
                                 </v-slide-x-reverse-transition>
                             </template>
                         </v-autocomplete>
-                        <v-btn block v-bind:disabled="addSearchQuery == ''" @click="invite(addSearchQuery)" v-bind:color="app.secondaryColor">Invite</v-btn>
+                        <v-btn block v-bind:disabled="addSearchQuery == '' || invitableUsers.length == 0" @click="invite(addSearchQuery)" v-bind:color="app.secondaryColor">Invite</v-btn>
                     </v-flex>
-                    <v-flex xs12 v-if="canRemove()" class="user-search" py-0 align-content-center>
+                    <v-flex xs12 v-if="canRemove" class="user-search" py-0 align-content-center>
                         <p class="ma-0 mt-3">Remove User</p>
-                        <v-autocomplete v-model="removeSearchQuery" :items="removableUsers()" no-data-text="No Users" color="black" dense width="150px">
+                        <v-autocomplete v-model="removeSearchQuery" :items="removableUsers" no-data-text="No Users" color="black" dense width="150px">
                             <template v-slot:append-outer>
                                 <v-slide-x-reverse-transition mode="out-in">
                                 </v-slide-x-reverse-transition>
@@ -176,10 +193,10 @@ var app = new Vue({
         welcome: true,
         testUsername: "",
         username: "",
+        rooms: [],
         badName: false,
         globalTimer: "",
         invites: [],
-        users: [],
         roomData: {
             messageHistory: [],
             users: []
@@ -254,7 +271,7 @@ var app = new Vue({
                                         app.getInvites()
                                         app.refreshLogin()
                                         app.getRoomData()
-                                        app.getAllUsers()
+                                        app.getRoomsAccess()
                                     }, UPDATE_INTERVAL);
 
                                     //set personal chat room
@@ -311,12 +328,13 @@ var app = new Vue({
             var roomName = `${app.username}-${room}`
             app.privateGameRooms[roomName] = { name: `${app.username}'s ${room}` }
 
-            // delete old game room
-            fetch(`${url}/${roomName}/users`, {
-                method: "DELETE",
+            // create new room
+            fetch(`${url}/${roomName}/create`, {
+                method: "POST",
                 headers: {
                     "Content-type": "application/json"
                 },
+                body: JSON.stringify({ user: app.username })
             }).then(function () {
                 app.switchRoom(roomName)
             })
@@ -351,6 +369,17 @@ var app = new Vue({
                 })
             })
         },
+        // Get a nice name for a room
+        getRoomName: function (room) {
+            var roomType = this.getRoomType(room)
+            var roomHost = this.getRoomHost(room)
+
+            if (roomType == "privateMessaging") {
+                return `${roomHost}'s Chat Room`
+            } else {
+                return `${roomHost}'s ${roomType}`
+            }
+        },
         getRoomHost(room) {
             var index = room.indexOf("-")
             var roomHost = room.substring(0, index)
@@ -365,7 +394,9 @@ var app = new Vue({
             fetch(`${url}/${app.page}/data`).then(function (res) {
                 res.json().then(function (data) {
                     app.roomData = data.data
-                    app.roomData.players = {}
+                    if (!app.roomData.players) {
+                        app.roomData.players = []
+                    }
 
                     //send user to home page if they are in a room they shouldn't be in
                     if (!app.roomData.users.includes(app.username)) {
@@ -382,18 +413,14 @@ var app = new Vue({
                 });
             });
         },
-        getAllUsers: function () {
-            fetch(`${url}/users`).then(function (res) {
+        getRoomsAccess: function () {
+            fetch(`${url}/${app.username}/access`).then(function (res) {
                 res.json().then(function (data) {
-                    app.users = data.users
+                    app.rooms = data.access
                 });
             });
-        },
+        }
     },
-
-    computed: {
-
-    }
 })
 
 
@@ -403,37 +430,3 @@ var app = new Vue({
 function isLast(user, list) {
     return list[list.length - 1] == user
 }
-
-{/* <div v-if="app.roomData.messageHistory.length > 0" class="messages-container">
-<v-layout column justify-center align-center>
-    <v-subheader>Offset Top</v-subheader>
-    {{ offsetTop }}
-</v-layout>
-<v-container
-id="scroll-target"
-style="max-height: 400px"
-class="scroll-y"
->
-    <v-layout
-        v-scroll:#scroll-target="onScroll"
-        column
-        align-center
-        justify-center
-    >
-    </v-layout>
-</v-container>
-<v-btn @click="scroll()">scroll</v-btn>
-<p v-for="(message, index) in app.roomData.messageHistory" v-bind:id="getId(index)">
-    {{message.user}}: {{message.text}}
-</p>
-</div>
-<v-card-text class="pb-0">
-<v-text-field label="Type a message" v-model="newMessage" outline v-bind:color="app.secondaryColor"
-    @keyup.enter="sendMessage({user: app.username, text: newMessage})">
-</v-text-field>
-Current users:<span v-for="user in app.roomData.users"> {{user}}<span v-if="!isLast(user, app.roomData.users)">,</span></span>
-</v-card-text>
-<v-card-actions>
-<v-btn block @click="sendMessage({user: app.username, text: newMessage})" v-bind:color="app.secondaryColor">send</v-btn>
-</v-card-actions>
-</v-card>` */}

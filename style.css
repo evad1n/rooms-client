@@ -2,6 +2,10 @@
     display: none;
 }
 
+#pictionary {
+    cursor: url(images/drawing.svg), pointer;
+  }
+
 #app {
     background-color: #DCEDC8;
     font-family: 'Signika', cursive;
@@ -53,14 +57,17 @@
     margin: 0 auto;
 }
 
-::-webkit-scrollbar { width: 0 important }
-
 .messages-container p{
     margin: 2px 5px 2px 8px;
 }
 
 .messages-container p:not(:last-child){
     border-bottom: 0.5px solid #7CB342;
+}
+
+.scores {
+    margin: 0;
+    height: 20px;
 }
 
 

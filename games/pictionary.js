@@ -30,16 +30,16 @@ var pictionary = new Vue({
             clearInterval(this.gameStartTimer)
 
             //Start timer
-            this.timer = setInterval(() => {
-                pictionary.sendPictionary()
-                pictionary.seconds += 0.5
+            // this.timer = setInterval(() => {
+            //     pictionary.sendPictionary()
+            //     pictionary.seconds += 0.5
 
-                // END TURN
-                if (pictionary.seconds > 30) {
-                    pictionary.resetPictionary()
-                    pictionary.seconds = 0
-                }
-            }, PICTIONARY_INTERVAL);
+            //     // END TURN
+            //     if (pictionary.seconds > 30) {
+            //         pictionary.resetPictionary()
+            //         pictionary.seconds = 0
+            //     }
+            // }, PICTIONARY_INTERVAL);
         },
         mousedown: function (e) {
             if (this.isTurn) {
@@ -88,55 +88,51 @@ var pictionary = new Vue({
                 }
             }
         },
-        resetPictionary: function () {
-            this.canvas.width = this.canvas.width;
-            this.points.length = 0;
-        },
-        getPictionary: function () {
-            fetch(`${url}/${app.page}/game`).then(function (res) {
-                res.json().then(function (data) {
-                    pictionary.points = data.points
-                });
-            });
-        },
-        sendPictionary: function () {
-            fetch(`${url}/${app.page}/game`, {
+        readyUp: function () {   
+            // Say that you are ready
+            fetch(`${url}/${app.page}/game/ready`, {
                 method: "POST",
                 headers: {
                     "Content-type": "application/json"
                 },
                 body: JSON.stringify({
-                    points: pictionary.points
+                    user: app.username
                 })
-            }).then(function () {
-                pictionary.getPictionary()
-            });
+            })
         },
-        ready: function () {
-            this.gameStartTimer = setInterval(() => {
-                fetch(`${url}/${app.page}/game/start`).then(function (res) {
-                    res.json().then(function (data) {
-                        if (data.started) {
-                            pictionary.activatePictionary()
-                        }
-                    });
-                });
-            }, 1000);
-        },
-        startGame: function () {
+        start: function () {
             //Start game
             fetch(`${url}/${app.page}/game/start`, {
                 method: "POST",
                 headers: {
                     "Content-type": "application/json"
                 },
-                body: JSON.stringify({
-                    turn: 0,
-                    started: true
-                })
-            }).then(function () {
-                pictionary.ready()
             })
-        }
+        },
+        reset: function () {
+            app.roomData.points = {}
+            app.roomData.canvas = {}
+            app.roomData.winner = "none"
+            app.roomData.started = false
+
+            // Set starting user for next game
+            app.roomData.first++
+            app.roomData.first %= app.roomData.players.length
+            app.roomData.turn.user = app.roomData.players[app.roomData.first].name
+            app.roomData.turn.turn = app.roomData.first
+
+            this.sendGameInfo()
+        },
+        sendGameInfo: function () {
+            fetch(`${url}/${app.page}/game`, {
+                method: "POST",
+                headers: {
+                    "Content-type": "application/json"
+                },
+                body: JSON.stringify({
+                    data: app.roomData
+                })
+            })
+        },
     },
 })
