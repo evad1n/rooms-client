@@ -226,7 +226,7 @@ var createPlayer = function () {
     pMesh = new THREE.Mesh(geometry, mirrorSphereMaterial);
     pMesh.scale.set(Math.sqrt(pAmount), Math.sqrt(pAmount), Math.sqrt(pAmount));
     scene.add(pMesh);
-    mirrorSphereCamera.position = mirrorSphere.position;
+    mirrorSphereCamera.position = pMesh.position;
     var material = new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load('images/ring.png'), side: THREE.DoubleSide, alphaTest: 0, transparent: true, opacity: 0.9, blending: THREE.AdditiveBlending });
     var geometry = new THREE.PlaneGeometry(1, 1, 1);
     pRing = new THREE.Mesh(geometry, material);
