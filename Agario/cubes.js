@@ -47,6 +47,8 @@ var stars = [];
 var scene = new THREE.Scene();
 scene.background = new THREE.Color(0x000000);
 
+
+
 var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 3000);
 var direction = new THREE.Vector3();
 camera.getWorldDirection(direction);
@@ -113,16 +115,16 @@ var randomColor = function () {
     return color;
 }
 
-var createSkyBox = function () {
-    var spaceArray = [
-        new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load('images/outerspace_left.png'), side: THREE.BackSide }),
-        new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load('images/outerspace_right.png'), side: THREE.BackSide }),
-        new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load('images/outerspace_up.png'), side: THREE.BackSide }),
-        new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load('images/outerspace_down.png'), side: THREE.BackSide }),
-        new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load('images/outerspace_front.png'), side: THREE.BackSide }),
-        new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load('images/outerspace_back.png'), side: THREE.BackSide })
-    ]
+var spaceArray = [
+   new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load('images/outerspace_left.png'), side: THREE.BackSide }),
+   new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load('images/outerspace_right.png'), side: THREE.BackSide }),
+   new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load('images/outerspace_up.png'), side: THREE.BackSide }),
+   new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load('images/outerspace_down.png'), side: THREE.BackSide }),
+   new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load('images/outerspace_front.png'), side: THREE.BackSide }),
+   new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load('images/outerspace_back.png'), side: THREE.BackSide })
+]
 
+var createSkyBox = function () {
     var spaceGeometry = new THREE.BoxGeometry(2500, 2500, 2500);
     pSpace = new THREE.Mesh(spaceGeometry, spaceArray);
     scene.add(pSpace);
@@ -212,11 +214,16 @@ mtlLoader.load('models/raptor.mtl', function (materials) {
 
 //UPDATE
 var createPlayer = function () {
+    var envMap = new THREE.TextureLoader().load(spaceArray);
+    
     var geometry = new THREE.SphereGeometry(1, 32, 32);
     var material = new THREE.MeshStandardMaterial({
         color: pColor,
         roughness: 0,
+        mapping: THREE.CubeReflectionMapping,
+        envMap: envMap
     });
+    
     pMesh = new THREE.Mesh(geometry, material);
     pMesh.scale.set(Math.sqrt(pAmount), Math.sqrt(pAmount), Math.sqrt(pAmount));
     scene.add(pMesh);
