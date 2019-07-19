@@ -242,7 +242,7 @@ var updatePlayer = function () {
 
     pMesh.rotation.set(pRotation.x, pRotation.y, pRotation.z);
     pRing.rotation.z += 0.001;
-    pRing.scale.set(pMesh.scale.x * 8, pMesh.scale.x * 8, pMesh.scale.x * 8);
+    pRing.scale.set(pMesh.scale.x * 7, pMesh.scale.x * 7, pMesh.scale.x * 7);
 
     //GROW
     pAmount += pSavedAmount / 30;
