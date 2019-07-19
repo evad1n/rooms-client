@@ -255,7 +255,7 @@ var updatePlayer = function () {
 
     pX -= pX / 30;
     pMesh.translateZ(pX / pInterval);
-    pRing.translateZ(pX / pInterval);
+    pRing.position = pMesh.position;
     pPosition = pMesh.position;
 
     players.forEach(function (player) {
