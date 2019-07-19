@@ -130,6 +130,10 @@ var createSkyBox = function () {
     scene.add(pSpace);
 }
 
+mirrorSphereCamera = new THREE.CubeCamera( 0.1, 5000, 512 );
+scene.add( mirrorSphereCamera );
+var mirrorSphereMaterial = new THREE.MeshBasicMaterial( { envMap: mirrorSphereCamera.renderTarget } );
+
 var createSun = function () {
     var sun = new THREE.DirectionalLight(0xffffff);
     sun.position.set(1, 1, 1).normalize();
@@ -216,13 +220,13 @@ mtlLoader.load('models/raptor.mtl', function (materials) {
 var createPlayer = function () {
     var geometry = new THREE.SphereGeometry(1, 32, 32);
     var material = new THREE.MeshStandardMaterial({
-        roughness: 0,
-        envMap: pSpace,
+        roughness: 0
     });
     
-    pMesh = new THREE.Mesh(geometry, material);
+    pMesh = new THREE.Mesh(geometry, mirrorSphereMaterial);
     pMesh.scale.set(Math.sqrt(pAmount), Math.sqrt(pAmount), Math.sqrt(pAmount));
     scene.add(pMesh);
+    mirrorSphereCamera.position = mirrorSphere.position;
     var material = new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load('images/ring.png'), side: THREE.DoubleSide, alphaTest: 0, transparent: true, opacity: 0.9, blending: THREE.AdditiveBlending });
     var geometry = new THREE.PlaneGeometry(1, 1, 1);
     pRing = new THREE.Mesh(geometry, material);
