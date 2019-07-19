@@ -19,7 +19,7 @@ var players = [
         ringcolor: 0xFF0000,
         amount: 47,
         alive: true,
-        ringrotation: 0
+        ringrotation: {x:0,y:0,z:0}
     },
     {
         username: "Japmes",
@@ -27,7 +27,7 @@ var players = [
         ringcolor: 0x00FF00,
         amount: 16,
         alive: true,
-        ringrotation: 0
+        ringrotation: {x:2,y:-1,z:0}
     },
     {
         username: "Jamppes",
@@ -35,7 +35,7 @@ var players = [
         ringcolor: 0xFF00FF,
         amount: 9,
         alive: true,
-        ringrotation: 0
+        ringrotation: {x:-3,y:4,z:0}
     },
 ];
 
@@ -291,8 +291,9 @@ var updatePlayers = function () {
             var geometry = new THREE.PlaneGeometry(1, 1, 1);
             player.ring = new THREE.Mesh(geometry, material);
             player.ring.position.set(player.position.x,player.position.y,player.position.z);
-            player.ringrotation -= 1;
-            player.ring.rotation.set(0,0,ringrotation);
+            player.ringrotation.z += 0.001;
+            player.ring.rotation.set(ringrotation.x,ringrotation.y,ringrotation.z);
+            player.ring.scale.set(Math.sqrt(player.amount) * 7, Math.sqrt(player.amount) * 7, Math.sqrt(player.amount) * 7);
             scene.add(player.ring);
         }
     })
