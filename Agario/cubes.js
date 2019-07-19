@@ -240,8 +240,6 @@ var updatePlayer = function () {
     pRotation.y = camera.rotation.y;
     pRotation.z = camera.rotation.z;
 
-    pMesh.rotation.set(pRotation.x, pRotation.y, pRotation.z);
-
     pRing.rotation.z += 0.001;
     pRing.scale.set(pMesh.scale.x * 8, pMesh.scale.x * 8, pMesh.scale.x * 8);
 
@@ -255,8 +253,8 @@ var updatePlayer = function () {
 
     pX -= pX / 30;
     pMesh.translateZ(pX / pInterval);
-    pRing.position = pMesh.position;
     pPosition = pMesh.position;
+    pRing.position.set(pPosition.x,pPosition.y,pPosition.z);
 
     players.forEach(function (player) {
         devour(player);
