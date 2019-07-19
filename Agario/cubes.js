@@ -199,6 +199,7 @@ mtlLoader.load('models/raptor.mtl', function (materials) {
 var createPlayer = function () {
     var geometry = new THREE.SphereGeometry(1, 32, 32);
     var material = new THREE.MeshStandardMaterial({
+        color: 0x000000,
         roughness: 0,
         envMap: scene.background
     });
