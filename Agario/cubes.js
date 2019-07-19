@@ -351,7 +351,8 @@ var sendPlayer = function () {
             position: pPosition,
             color: pColor,
             amount: pAmount,
-            alive: pAlive
+            alive: pAlive,
+            ringrotation: pRing.rotation
         })
     })
 }
