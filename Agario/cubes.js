@@ -127,6 +127,7 @@ var spaceArray = [
 var createSkyBox = function () {
     var spaceGeometry = new THREE.BoxGeometry(2500, 2500, 2500);
     pSpace = new THREE.Mesh(spaceGeometry, spaceArray);
+    pSpace.format = THREE.RGBFormat;
     scene.add(pSpace);
 }
 
@@ -214,14 +215,9 @@ mtlLoader.load('models/raptor.mtl', function (materials) {
 
 //UPDATE
 var createPlayer = function () {
-    var envMap = new THREE.TextureLoader().load(spaceArray);
-    
     var geometry = new THREE.SphereGeometry(1, 32, 32);
-    var material = new THREE.MeshStandardMaterial({
-        color: pColor,
-        roughness: 0,
-        mapping: THREE.CubeReflectionMapping,
-        envMap: envMap
+    var material = new THREE.MeshPhongMaterial({
+        envMap: pSpace
     });
     
     pMesh = new THREE.Mesh(geometry, material);
