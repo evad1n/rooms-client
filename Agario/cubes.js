@@ -130,10 +130,6 @@ var createSkyBox = function () {
     scene.add(pSpace);
 }
 
-mirrorSphereCamera = new THREE.CubeCamera( 0.1, 5000, 512 );
-scene.add( mirrorSphereCamera );
-var mirrorSphereMaterial = new THREE.MeshBasicMaterial( { envMap: mirrorSphereCamera.texture } );
-
 var createSun = function () {
     var sun = new THREE.DirectionalLight(0xffffff);
     sun.position.set(1, 1, 1).normalize();
@@ -224,10 +220,9 @@ var createPlayer = function () {
         envMap: scene.background
     });
     
-    pMesh = new THREE.Mesh(geometry, mirrorSphereMaterial);
+    pMesh = new THREE.Mesh(geometry, material);
     pMesh.scale.set(Math.sqrt(pAmount), Math.sqrt(pAmount), Math.sqrt(pAmount));
     scene.add(pMesh);
-    mirrorSphereCamera.position = pMesh.position;
     var material = new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load('images/ring.png'), side: THREE.DoubleSide, alphaTest: 0, transparent: true, opacity: 0.9, blending: THREE.AdditiveBlending });
     var geometry = new THREE.PlaneGeometry(1, 1, 1);
     pRing = new THREE.Mesh(geometry, material);
