@@ -204,7 +204,7 @@ var createPlayer = function () {
         roughness: 0,
         metalness: 1,
         envMap: scene.background,
-        side: THREE.backSide
+        side: THREE.BackSide
     });
     
     pMesh = new THREE.Mesh(geometry, material);
