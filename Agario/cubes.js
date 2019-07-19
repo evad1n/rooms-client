@@ -45,7 +45,7 @@ var starAmount = 100;
 var stars = [];
 
 var scene = new THREE.Scene();
-scene.background = new THREE.CubeTextureLoader().setPath('images/').load(['images/outerspace_left.png','images/outerspace_right.png','images/outerspace_up.png','images/outerspace_down.png','images/outerspace_front.png','images/outerspace_back.png'])
+scene.background = new THREE.CubeTextureLoader().load(['images/outerspace_left.png','images/outerspace_right.png','images/outerspace_up.png','images/outerspace_down.png','images/outerspace_front.png','images/outerspace_back.png'])
 
 
 
