@@ -216,8 +216,9 @@ mtlLoader.load('models/raptor.mtl', function (materials) {
 //UPDATE
 var createPlayer = function () {
     var geometry = new THREE.SphereGeometry(1, 32, 32);
-    var material = new THREE.MeshPhongMaterial({
-        envMap: pSpace
+    var material = new THREE.MeshStandardMaterial({
+        roughness: 0,
+        envMap: pSpace,
     });
     
     pMesh = new THREE.Mesh(geometry, material);
