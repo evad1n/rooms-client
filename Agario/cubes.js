@@ -207,9 +207,10 @@ var createPlayer = function () {
     pMesh = new THREE.Mesh(geometry, material);
     pMesh.scale.set(Math.sqrt(pAmount), Math.sqrt(pAmount), Math.sqrt(pAmount));
     scene.add(pMesh);
-    var material = new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load('images/ring.png'), side: THREE.DoubleSide, alphaTest: 0, transparent: true, opacity: 0.9, blending: THREE.AdditiveBlending });
+    var material = new THREE.MeshBasicMaterial({ color: 0xFF0000, map: new THREE.TextureLoader().load('images/ring.png'), side: THREE.DoubleSide, alphaTest: 0, transparent: true, opacity: 0.9, blending: THREE.AdditiveBlending });
     var geometry = new THREE.PlaneGeometry(1, 1, 1);
     pRing = new THREE.Mesh(geometry, material);
+    pRing.rotation.x = -1;
     scene.add(pRing);
 }
 
@@ -241,8 +242,7 @@ var updatePlayer = function () {
 
     pMesh.rotation.set(pRotation.x, pRotation.y, pRotation.z);
 
-    pRing.rotation.set(pRotation.x, pRotation.y, pRotation.z + pRingRotation);
-    pRingRotation += 0.001;
+    pRing.rotation.z += 0.001;
     pRing.scale.set(pMesh.scale.x * 8, pMesh.scale.x * 8, pMesh.scale.x * 8);
 
     //GROW
