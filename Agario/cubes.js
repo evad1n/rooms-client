@@ -14,7 +14,7 @@ var pRing = null;
 var pRingColor = 0xFFCC00;
 var pInterval = 30;
 
-var users = [
+var players = [
     {
         username: "James",
         position: { x: 5, y: 0, z: -32 },
@@ -277,8 +277,8 @@ var updatePlayer = function () {
     pPosition = pMesh.position;
     pRing.position.set(pPosition.x, pPosition.y, pPosition.z);
 
-    users.forEach(function (user) {
-        devour(user);
+    players.forEach(function (player) {
+        devour(player);
     })
     asteroids.forEach(function (asteroid) {
         devour(asteroid);
@@ -288,33 +288,33 @@ var updatePlayer = function () {
 }
 
 var updatePlayers = function () {
-    users.forEach(function (user) {
+    players.forEach(function (player) {
         //Mesh Creation
-        if (user.alive) {
-            if (typeof user.mesh === 'undefined') {
+        if (player.alive) {
+            if (typeof player.mesh === 'undefined') {
                 var geometry = new THREE.SphereGeometry(1, 32, 32);
                 var material = new THREE.MeshStandardMaterial({ roughness: 0, metalness: 1, refractionRatio: 0.8, envMap: scene.background });
-                user.mesh = new THREE.Mesh(geometry, material);
-                user.mesh.position.set(user.position.x, user.position.y, user.position.z);
-                user.mesh.scale.set(Math.sqrt(user.amount), Math.sqrt(user.amount), Math.sqrt(user.amount));
-                scene.add(user.mesh);
+                player.mesh = new THREE.Mesh(geometry, material);
+                player.mesh.position.set(player.position.x, player.position.y, player.position.z);
+                player.mesh.scale.set(Math.sqrt(player.amount), Math.sqrt(player.amount), Math.sqrt(player.amount));
+                scene.add(player.mesh);
 
-                //var material = new THREE.MeshBasicMaterial({ color: user.ringcolor, map: new THREE.TextureLoader().load('images/ring.png'), side: THREE.DoubleSide, alphaTest: 0, transparent: true, opacity: 1, blending: THREE.AdditiveBlending });
+                //var material = new THREE.MeshBasicMaterial({ color: player.ringcolor, map: new THREE.TextureLoader().load('images/ring.png'), side: THREE.DoubleSide, alphaTest: 0, transparent: true, opacity: 1, blending: THREE.AdditiveBlending });
                 //var geometry = new THREE.PlaneGeometry(1, 1, 1);
-                //user.ring = new THREE.Mesh(geometry, material);
-                //user.ring.position.set(user.position.x,user.position.y,user.position.z);
-                //user.ringrotation.z += 0.001;
-                //user.ring.rotation.set(user.ringrotation.x,user.ringrotation.y,user.ringrotation.z);
-                //user.ring.scale.set(Math.sqrt(user.amount) * 7, Math.sqrt(user.amount) * 7, Math.sqrt(user.amount) * 7);
-                //scene.add(user.ring);
+                //player.ring = new THREE.Mesh(geometry, material);
+                //player.ring.position.set(player.position.x,player.position.y,player.position.z);
+                //player.ringrotation.z += 0.001;
+                //player.ring.rotation.set(player.ringrotation.x,player.ringrotation.y,player.ringrotation.z);
+                //player.ring.scale.set(Math.sqrt(player.amount) * 7, Math.sqrt(player.amount) * 7, Math.sqrt(player.amount) * 7);
+                //scene.add(player.ring);
             } else {
-                user.mesh.position.set(user.position.x, user.position.y, user.position.z);
-                user.mesh.scale.set(Math.sqrt(user.amount), Math.sqrt(user.amount), Math.sqrt(user.amount));
+                player.mesh.position.set(player.position.x, player.position.y, player.position.z);
+                player.mesh.scale.set(Math.sqrt(player.amount), Math.sqrt(player.amount), Math.sqrt(player.amount));
             }
         } else {
-            scene.remove(user.mesh);
-            user.mesh.geometry.dispose();
-            user.mesh.material.dispose();
+            scene.remove(player.mesh);
+            player.mesh.geometry.dispose();
+            player.mesh.material.dispose();
         }
     })
 }
@@ -347,7 +347,7 @@ var updateAsteroids = function () {
 
 //SERVER COMMUNICATION
 var sendPlayer = function () {
-    fetch(`${url}/singularities`, {
+    fetch(`${url}/singularity/update`, {
         method: "POST",
         headers: {
             "Content-type": "application/json"
