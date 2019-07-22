@@ -1,3 +1,5 @@
+const url = 'http://localhost:3000';
+
 var pUsername = "Antoine";
 var pPosition = { x: 0, y: 0, z: 0 };
 var pRotation = { x: 0, y: 0, z: 0 };
@@ -46,7 +48,7 @@ var starAmount = 100;
 var stars = [];
 
 var scene = new THREE.Scene();
-var spaceTextures = ['games/singularity/images/outerspace_left.png', 'games/singularity/images/outerspace_right.png', 'games/singularity/images/outerspace_up.png', 'games/singularity/images/outerspace_down.png', 'games/singularity/images/outerspace_front.png', 'games/singularity/images/outerspace_back.png'];
+var spaceTextures = ['images/outerspace_left.png', 'images/outerspace_right.png', 'images/outerspace_up.png', 'images/outerspace_down.png', 'images/outerspace_front.png', 'images/outerspace_back.png'];
 //var spaceTextures = ['images/space_1_left.png', 'images/space_1_right.png', 'images/space_1_up.png', 'images/space_1_down.png', 'images/space_1_front.png', 'images/space_1_back.png'];
 scene.background = new THREE.CubeTextureLoader().load(spaceTextures);
 
@@ -213,7 +215,7 @@ var createPlayer = function () {
     scene.add(pMesh);
     var material = new THREE.MeshLambertMaterial({
         color: pRingColor,
-        map: new THREE.TextureLoader().load('games/singularity/images/ring.png'),
+        map: new THREE.TextureLoader().load('images/ring.png'),
         side: THREE.DoubleSide,
         alphaTest: 0,
         transparent: true,
