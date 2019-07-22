@@ -229,10 +229,9 @@ var createPlayer = function () {
     scene.add(pRing);
 }
 
+createPlayer();
 pMesh.scale.set(Math.sqrt(pAmount), Math.sqrt(pAmount), Math.sqrt(pAmount));
 camera.position.set(pPosition.x, pPosition.y + Math.sqrt(pAmount) * 2, pPosition.z);
-
-createPlayer();
 
 var devour = function (other) {
     var dx = pPosition.x - other.position.x;
