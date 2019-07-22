@@ -288,7 +288,7 @@ var updatePlayers = function () {
     players.forEach(function (player) {
         //Mesh Creation
         if (player.alive) {
-            if (typeof player.mesh !== 'undefined') {
+            if (typeof player.mesh === 'undefined') {
                 var geometry = new THREE.SphereGeometry(1, 32, 32);
                 var material = new THREE.MeshStandardMaterial({ roughness: 0, metalness: 1, envMap: scene.background });
                 player.mesh = new THREE.Mesh(geometry, material);
