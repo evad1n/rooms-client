@@ -201,9 +201,12 @@ mtlLoader.load('models/raptor.mtl', function (materials) {
 //UPDATE
 var createPlayer = function () {
     var geometry = new THREE.SphereGeometry(1, 32, 32);
+    var blackhole = new THREE.CubeTextureLoader().load(spaceTextures);
+    blackhole.mapping = THREE.CubeRefractionMapping;
     var material = new THREE.MeshStandardMaterial({
         roughness: 0,
         metalness: 1.1,
+        refractionRatio: 0.4,
         envMap: scene.background,
     });
 
