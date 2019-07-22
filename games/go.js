@@ -1,4 +1,3 @@
-console.log('Go linked');
 
 // GO
 

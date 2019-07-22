@@ -119,25 +119,75 @@
 
                         <!--Game Window-->
                         <v-card height="606.8px" elevation="18" v-bind:color="primaryColor">
-                            <canvas id="pictionary" ref="canvas" v-canvas height="400px" width="400px"></canvas>
+                            <v-layout column fill-height>
 
-                            <!--Game Statistics-->
-                            <v-card-text>
-                                <span>{{pictionary.seconds}}</span>
-                                <span v-if="pictionary.isTurn">It is Your Turn</span>
-                                <span class="float: right">Score: 6</span>
-                            </v-card-text>
+                                <!-- BOARD -->
+                                <v-flex xs8>
+                                    <v-layout>
+                                        <v-flex xs1 pl-4 pt-4>
+                                            <div v-bind:style="{ backgroundColor: pictionary.marker_color}"
+                                                style="width: 30px; height: 30px"></div>
+                                        </v-flex>
+                                        <v-flex xs3>
+                                            <v-select placeholder="color" :items="pictionary.colors"
+                                                v-model="pictionary.marker_color" color="black" dense>
+                                            </v-select>
+                                        </v-flex>
+                                        <v-flex xs8>
+                                            <canvas id="pictionary" ref="canvas" v-canvas height="400px"
+                                                width="400px"></canvas>
+                                        </v-flex>
+                                    </v-layout>
+                                </v-flex>
 
-                            <!--Game Controls-->
-                            <v-card-text>
-                                <v-btn v-if="getRoomHost(room) == username" @click="pictionary.activatePictionary()">
-                                    Start</v-btn>
-                                <v-btn v-if="getRoomHost(room) != username" @click="pictionary.ready()">Ready
-                                </v-btn>
-                                <v-select :items="pictionary.colors" v-model="pictionary.marker_color"></v-select>
-                                <v-text-field v-if="!pictionary.isTurn" placeholder="What is this drawing?">
-                                </v-text-field>
-                            </v-card-text>
+                                <!-- STATISTICS -->
+                                <v-flex xs4>
+                                    <v-layout column>
+                                        <v-flex xs2>
+                                            <p class="text-xs-center">{{Math.floor(pictionary.seconds)}}</p>
+                                        </v-flex>
+                                        <v-flex xs4>
+                                            <h4 class="text-xs-center" py-0>SCORE</h4>
+                                            <v-divider></v-divider>
+                                            <p class="text-xs-center scores">
+                                                <span v-for="player in app.roomData.players">{{player.name}}:
+                                                    {{player.score}} &emsp;</span>
+                                            </p>
+                                        </v-flex>
+                                        <v-flex xs2>
+                                            <p class="text-xs-center"
+                                                v-if="app.roomData.started && app.roomData.turn.user == app.username && app.roomData.winner == 'none'">
+                                                It
+                                                is
+                                                Your
+                                                Turn</p>
+                                            <p class="text-xs-center"
+                                                v-if="app.roomData.started && app.roomData.turn.user != app.username && app.roomData.winner == 'none'">
+                                                It
+                                                is
+                                                {{app.roomData.turn.user}}'s turn</p>
+                                        </v-flex>
+                                        <v-flex xs4>
+                                            <v-btn v-if="!app.roomData.players.some(e => e.name === app.username)"
+                                                @click="pictionary.readyUp()" v-bind:color="secondaryColor" block>
+                                                Ready
+                                            </v-btn>
+                                            <v-btn
+                                                v-if="!app.roomData.started && app.roomData.players.length >= 2 && app.roomData.players.some(e => e.name === app.username) && app.getRoomHost(app.page) == app.username"
+                                                @click="pictionary.start()" v-bind:color="secondaryColor" block>
+                                                Start</v-btn>
+                                            <v-btn
+                                                v-if="app.roomData.started && app.roomData.turn.user == app.username && app.roomData.winner == 'none' && pictionary.seconds == 0"
+                                                @click="pictionary.beginDrawing()" v-bind:color="secondaryColor" block>
+                                                Begin Drawing</v-btn>
+                                            <v-btn
+                                                v-if="app.roomData.winner != 'none' && app.getRoomHost(app.page) == app.username"
+                                                @click="pictionary.reset()" v-bind:color="secondaryColor" block>
+                                                Play Again</v-btn>
+                                        </v-flex>
+                                    </v-layout>
+                                </v-flex>
+                            </v-layout>
                         </v-card>
 
                     </v-flex>
@@ -240,7 +290,7 @@
                     </v-flex>
 
                     <!-- SIDEBAR -->
-                    <v-flex xs4>
+                    <v-flex xs4 pt-0>
                         <v-card v-bind:color="secondaryColor">
                             <Messaging v-bind:route="room" v-bind:key="index"></Messaging>
                         </v-card>
@@ -255,6 +305,7 @@
 <script src="https://cdn.jsdelivr.net/npm/vue"></script>
 <script src="https://cdn.jsdelivr.net/npm/vuetify/dist/vuetify.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/vue-chat-scroll/dist/vue-chat-scroll.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js"></script>
 <script src="script.js"></script>
 <script src="games/pictionary.js"></script>
 <script src="games/tictactoe.js"></script>

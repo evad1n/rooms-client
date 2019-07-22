@@ -1,6 +1,12 @@
 // const url = 'https://server-rooms.herokuapp.com'
 const url = 'http://localhost:3000'
 
+var socket = io.connect(url)
+
+socket.on('connect', function(data) {
+    socket.emit('join', 'Hello World from client');
+});
+
 const UPDATE_INTERVAL = 200
 
 var PrivateRoomCategory = {
@@ -153,7 +159,7 @@ var Messaging = {
                         </p>
                     </div>
                     <v-card-text class="pb-0">
-                        <v-text-field label="Type a message" v-model="newMessage" outline v-bind:color="app.secondaryColor"
+                        <v-text-field hide-details label="Type a message" v-model="newMessage" outline v-bind:color="app.secondaryColor"
                             @keyup.enter="sendMessage({user: app.username, text: newMessage})">
                         </v-text-field>
                         Current users:<span v-for="user in app.roomData.users"> {{user}}<span v-if="!isLast(user, app.roomData.users)">,</span></span>
@@ -268,10 +274,10 @@ var app = new Vue({
 
                                     // START GLOBAL INTERVAL
                                     app.globalTimer = setInterval(() => {
-                                        app.getInvites()
-                                        app.refreshLogin()
-                                        app.getRoomData()
-                                        app.getRoomsAccess()
+                                        //app.getInvites()
+                                        //app.refreshLogin()
+                                        //app.getRoomData()
+                                        //app.getRoomsAccess()
                                     }, UPDATE_INTERVAL);
 
                                     //set personal chat room

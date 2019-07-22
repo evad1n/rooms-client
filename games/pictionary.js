@@ -10,39 +10,47 @@ var pictionary = new Vue({
         canvas: null,
         context: null,
         isDrawing: false,
-        isTurn: true,
         startX: 0,
         startY: 0,
-        points: [],
         timer: null,
         seconds: 0,
-        gameStartTimer: null
+        lines: [],
     },
     methods: {
-        activatePictionary: function () {
+        beginDrawing: function () {
             this.canvas = app.$refs.canvas[0];
             this.context = this.canvas.getContext("2d");
             this.canvas.addEventListener('mousedown', this.mousedown);
             this.canvas.addEventListener('mousemove', this.mousemove);
             document.addEventListener('mouseup', this.mouseup);
 
-            //End ready timer
-            clearInterval(this.gameStartTimer)
+            app.roomData.drawing = true
 
             //Start timer
-            // this.timer = setInterval(() => {
-            //     pictionary.sendPictionary()
-            //     pictionary.seconds += 0.5
+            this.timer = setInterval(() => {
+                pictionary.seconds += 0.5
 
-            //     // END TURN
-            //     if (pictionary.seconds > 30) {
-            //         pictionary.resetPictionary()
-            //         pictionary.seconds = 0
-            //     }
-            // }, PICTIONARY_INTERVAL);
+                // Send data as image
+                //app.roomData.canvas = this.canvas.toDataURL('image/png');
+                //read in image to canvas
+                //this.context.drawImage(app.roomData.canvas, 0, 0)
+
+                // END TURN
+                if (pictionary.seconds > 30) {
+                    pictionary.endDrawing()
+                    pictionary.seconds = 0
+                }
+            }, PICTIONARY_INTERVAL);
+        },
+        endDrawing: function () {
+            app.roomData.drawing = false
+            this.canvas.removeEventListener('mousedown', this.mousedown);
+            this.canvas.removeEventListener('mousemove', this.mousemove);
+            document.removeEventListener('mouseup', this.mouseup);
+            clearInterval(this.timer)
         },
         mousedown: function (e) {
-            if (this.isTurn) {
+            if (app.roomData.turn.user == app.username) {
                 var rect = this.canvas.getBoundingClientRect();
                 var x = e.clientX - rect.left;
                 var y = e.clientY - rect.top;
@@ -50,14 +58,10 @@ var pictionary = new Vue({
                 this.isDrawing = true;
                 this.startX = x;
                 this.startY = y;
-                this.points.push({
-                    x: x,
-                    y: y
-                })
             }
         },
         mousemove: function (e) {
-            if (this.isTurn) {
+            if (app.roomData.turn.user == app.username) {
                 var rect = this.canvas.getBoundingClientRect();
                 var x = e.clientX - rect.left;
                 var y = e.clientY - rect.top;
@@ -73,22 +77,15 @@ var pictionary = new Vue({
 
                     this.startX = x;
                     this.startY = y;
-                    this.points.push({
-                        x: x,
-                        y: y
-                    });
                 }
             }
         },
         mouseup: function (e) {
-            if (this.isTurn) {
+            if (app.roomData.turn.user == app.username) {
                 this.isDrawing = false;
-                if (this.points.length > 0) {
-                    localStorage['points'] = JSON.stringify(this.points);
-                }
             }
         },
-        readyUp: function () {   
+        readyUp: function () {
             // Say that you are ready
             fetch(`${url}/${app.page}/game/ready`, {
                 method: "POST",
@@ -110,8 +107,7 @@ var pictionary = new Vue({
             })
         },
         reset: function () {
-            app.roomData.points = {}
-            app.roomData.canvas = {}
+            app.roomData.canvas = null
             app.roomData.winner = "none"
             app.roomData.started = false
 
@@ -134,5 +130,90 @@ var pictionary = new Vue({
                 })
             })
         },
+        test: function () {
+            // Send data as image
+            app.roomData.canvas = this.canvas.toDataURL('image/png');
+            console.log(app.roomData.canvas)
+            //read in image to canvas
+            this.context.drawImage(this.canvas, 0, 0)
+
+            //http://code-and.coffee/post/2015/collaborative-drawing-canvas-node-websocket/
+        }
     },
 })
+
+
+//     // register mouse event handlers
+//     canvas.onmousedown = function(e){ mouse.click = true; };
+//     canvas.onmouseup = function(e){ mouse.click = false; };
+
+//     canvas.onmousemove = function(e) {
+//        // normalize mouse position to range 0.0 - 1.0
+//        mouse.pos.x = e.clientX / width;
+//        mouse.pos.y = e.clientY / height;
+//        mouse.move = true;
+//     };
+
+//     // draw line received from server
+//      socket.on('draw_line', function (data) {
+//        var line = data.line;
+//        context.beginPath();
+//        context.moveTo(line[0].x * width, line[0].y * height);
+//        context.lineTo(line[1].x * width, line[1].y * height);
+//        context.stroke();
+//     });
+
+//     // main loop, running every 25ms
+//     function mainLoop() {
+//        // check if the user is drawing
+//        if (mouse.click && mouse.move && mouse.pos_prev) {
+//           // send line to to the server
+//           socket.emit('draw_line', { line: [ mouse.pos, mouse.pos_prev ] });
+//           mouse.move = false;
+//        }
+//        mouse.pos_prev = {x: mouse.pos.x, y: mouse.pos.y};
+//        setTimeout(mainLoop, 25);
+//     }
+//     mainLoop();
+//  });
+
+function getDrawingLoop() {
+    // check if someone is drawing
+    if (app.roomData.drawing) {
+        var diff = app.roomData.lines.length - pictionary.lines.length
+        // if there are new lines
+        if (diff > 0) {
+            // add to drawing
+            for (let i = 0; i < diff; i++) {
+                var line = app.roomData.lines[pictionary.lines.length + i]
+                pictionary.lines.push(line)
+
+                // draw line 
+                context.beginPath();
+                context.moveTo(line[0].x * width, line[0].y * height);
+                context.lineTo(line[1].x * width, line[1].y * height);
+                context.stroke();
+            }
+        }
+
+        // run every 25 ms
+        setTimeout(getDrawingLoop, 25);
+    }
+}
+
+function sendDrawingLoop() {
+    // check if someone is drawing
+    if (app.roomData.drawing && app.roomData.turn.user == app.username) {
+        app.roomData.lines = pictionary.lines
+        
+        if (mouse.click && mouse.move && mouse.pos_prev) {
+            // send line to to the server
+            socket.emit('draw_line', { line: [mouse.pos, mouse.pos_prev] });
+            mouse.move = false;
+        }
+        mouse.pos_prev = { x: mouse.pos.x, y: mouse.pos.y };
+
+        // run every 25 ms
+        setTimeout(sendDrawingLoop, 25);
+    }
+}
