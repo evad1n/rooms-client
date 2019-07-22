@@ -51,8 +51,6 @@ var scene = new THREE.Scene();
 var spaceTextures = ['images/outerspace_left.png', 'images/outerspace_right.png', 'images/outerspace_up.png', 'images/outerspace_down.png', 'images/outerspace_front.png', 'images/outerspace_back.png'];
 //var spaceTextures = ['images/space_1_left.png', 'images/space_1_right.png', 'images/space_1_up.png', 'images/space_1_down.png', 'images/space_1_front.png', 'images/space_1_back.png'];
 scene.background = new THREE.CubeTextureLoader().load(spaceTextures);
-scene.background.material.emissive = true;
-scene.background.material.emissionIntensity = 20;
 
 var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 3000);
 var direction = new THREE.Vector3();
