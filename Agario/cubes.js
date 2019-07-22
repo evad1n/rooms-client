@@ -9,7 +9,7 @@ var pY = 0;
 var pZ = 0;
 var pMesh = null;
 var pRing = null;
-var pRingColor = 0x000000;
+var pRingColor = 0xFFCC00;
 var pInterval = 30;
 
 var players = [
@@ -211,7 +211,7 @@ var createPlayer = function () {
     pMesh.scale.set(Math.sqrt(pAmount), Math.sqrt(pAmount), Math.sqrt(pAmount));
     scene.add(pMesh);
     var material = new THREE.MeshLambertMaterial({
-        color: 0xFFCC00,
+        color: pRingColor,
         map: new THREE.TextureLoader().load('images/ring.png'),
         side: THREE.DoubleSide,
         alphaTest: 0,
