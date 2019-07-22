@@ -205,7 +205,6 @@ var createPlayer = function () {
         roughness: 0,
         metalness: 1.1,
         envMap: scene.background,
-        side: THREE.BackSide
     });
 
     pMesh = new THREE.Mesh(geometry, material);
@@ -259,7 +258,7 @@ var updatePlayer = function () {
     pRotation.z = camera.rotation.z;
 
     pMesh.rotation.set(pRotation.x, pRotation.y, pRotation.z);
-    pRing.rotateZ(0.005);
+    pRing.rotateZ(0.001);
     pRing.scale.set(pMesh.scale.x * 7, pMesh.scale.x * 7, pMesh.scale.x * 7);
 
     //GROW
