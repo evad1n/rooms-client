@@ -293,7 +293,7 @@ var updatePlayers = function () {
         if (user.alive) {
             if (typeof user.mesh === 'undefined') {
                 var geometry = new THREE.SphereGeometry(1, 32, 32);
-                var material = new THREE.MeshStandardMaterial({ roughness: 0, metalness: 1, envMap: scene.background });
+                var material = new THREE.MeshStandardMaterial({ roughness: 0, metalness: 1, refractionRatio: 0.9, envMap: scene.background });
                 user.mesh = new THREE.Mesh(geometry, material);
                 user.mesh.position.set(user.position.x, user.position.y, user.position.z);
                 user.mesh.scale.set(Math.sqrt(user.amount), Math.sqrt(user.amount), Math.sqrt(user.amount));
