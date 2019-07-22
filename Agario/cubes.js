@@ -203,7 +203,7 @@ var createPlayer = function () {
     var geometry = new THREE.SphereGeometry(1, 32, 32);
     var material = new THREE.MeshStandardMaterial({
         roughness: 0,
-        metalness: 1.1,
+        metalness: 1,
         envMap: scene.background
     });
 
