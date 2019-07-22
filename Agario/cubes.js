@@ -211,7 +211,7 @@ var createPlayer = function () {
     pMesh.scale.set(Math.sqrt(pAmount), Math.sqrt(pAmount), Math.sqrt(pAmount));
     scene.add(pMesh);
     var material = new THREE.MeshLambertMaterial({
-        color: 0xFF0000,
+        color: 0xFFCC00,
         map: new THREE.TextureLoader().load('images/ring.png'),
         side: THREE.DoubleSide,
         alphaTest: 0,
