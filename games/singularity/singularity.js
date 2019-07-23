@@ -9,7 +9,7 @@ var pY = 0;
 var pZ = 0;
 var pMesh = null;
 var pRing = null;
-var pRingColor = 0xFF8844;
+var pRingColor = 0x33FF55;
 var pInterval = 30;
 
 var players = [];
