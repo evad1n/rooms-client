@@ -352,14 +352,14 @@ var sendPlayer = function () {
         headers: {
             "Content-type": "application/json"
         },
-        body: {
+        body: JSON.stringify({
             username: pUsername,
             position: pPosition,
             ringcolor: pRingColor,
             amount: pAmount,
             alive: pAlive,
             ringrotation: pRing.rotation
-        }
+        })
     })
 }
 

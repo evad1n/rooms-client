@@ -1,11 +1,5 @@
-// const url = 'https://server-rooms.herokuapp.com'
-const url = 'http://localhost:3000'
-
-var socket = io.connect(url)
-
-socket.on('connect', function(data) {
-    socket.emit('join', 'Hello World from client');
-});
+const url = 'https://server-rooms.herokuapp.com'
+// const url = 'http://localhost:3000'
 
 const UPDATE_INTERVAL = 200
 
@@ -274,10 +268,10 @@ var app = new Vue({
 
                                     // START GLOBAL INTERVAL
                                     app.globalTimer = setInterval(() => {
-                                        //app.getInvites()
-                                        //app.refreshLogin()
-                                        //app.getRoomData()
-                                        //app.getRoomsAccess()
+                                        app.getInvites()
+                                        app.refreshLogin()
+                                        app.getRoomData()
+                                        app.getRoomsAccess()
                                     }, UPDATE_INTERVAL);
 
                                     //set personal chat room

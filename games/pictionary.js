@@ -10,8 +10,8 @@ var pictionary = new Vue({
         canvas: null,
         context: null,
         isDrawing: false,
-        startX: 0,
-        startY: 0,
+        startPos: {},
+        endPos: {},
         timer: null,
         seconds: 0,
         lines: [],
@@ -30,10 +30,7 @@ var pictionary = new Vue({
             this.timer = setInterval(() => {
                 pictionary.seconds += 0.5
 
-                // Send data as image
-                //app.roomData.canvas = this.canvas.toDataURL('image/png');
-                //read in image to canvas
-                //this.context.drawImage(app.roomData.canvas, 0, 0)
+                pictionary.updateDrawing()
 
                 // END TURN
                 if (pictionary.seconds > 30) {
@@ -41,6 +38,7 @@ var pictionary = new Vue({
                     pictionary.seconds = 0
                 }
             }, PICTIONARY_INTERVAL);
+            this.sendGameInfo()
         },
         endDrawing: function () {
             app.roomData.drawing = false
@@ -56,8 +54,7 @@ var pictionary = new Vue({
                 var y = e.clientY - rect.top;
 
                 this.isDrawing = true;
-                this.startX = x;
-                this.startY = y;
+                this.startPos = { x: x, y: y }
             }
         },
         mousemove: function (e) {
@@ -68,15 +65,14 @@ var pictionary = new Vue({
 
                 if (this.isDrawing) {
                     this.context.beginPath();
-                    this.context.moveTo(this.startX, this.startY);
+                    this.context.moveTo(this.startPos.x, this.startPos.y);
                     this.context.lineTo(x, y);
                     this.context.lineWidth = 5;
                     this.context.lineCap = 'round';
                     this.context.strokeStyle = this.marker_color;
                     this.context.stroke();
 
-                    this.startX = x;
-                    this.startY = y;
+                    this.startPos = { x: x, y: y }
                 }
             }
         },
@@ -120,6 +116,8 @@ var pictionary = new Vue({
             this.sendGameInfo()
         },
         sendGameInfo: function () {
+            //app.roomData.lines = pictionary.lines
+
             fetch(`${url}/${app.page}/game`, {
                 method: "POST",
                 headers: {
@@ -130,90 +128,41 @@ var pictionary = new Vue({
                 })
             })
         },
-        test: function () {
-            // Send data as image
-            app.roomData.canvas = this.canvas.toDataURL('image/png');
-            console.log(app.roomData.canvas)
-            //read in image to canvas
-            this.context.drawImage(this.canvas, 0, 0)
+        updateDrawing: function () {
+            // check if someone is drawing
+            if (app.roomData.drawing) {
 
-            //http://code-and.coffee/post/2015/collaborative-drawing-canvas-node-websocket/
+                // If this user is drawing
+                if (app.roomData.turn.user == app.username) {
+                    if (true) {
+                        var endPos = { x: pictionary.startPos.x, y: pictionary.startPos.y }
+                        // send line to to the server
+                        app.roomData.lines.push({ start: pictionary.startPos, end: endPos, color: pictionary.marker_color })
+                        // send data
+                        pictionary.sendGameInfo()
+                    }
+                }
+                else {
+                    var diff = app.roomData.lines.length - pictionary.lines.length
+                    // if there are new lines
+                    if (diff > 0) {
+                        // add to drawing
+                        for (let i = 0; i < diff; i++) {
+                            var line = app.roomData.lines[pictionary.lines.length + i]
+                            pictionary.lines.push(line)
+
+                            // draw line 
+                            this.context.beginPath();
+                            this.context.moveTo(line.start.x, line.start.y);
+                            this.context.lineTo(line.end.x, line.end.y);
+                            this.context.lineWidth = 5;
+                            this.context.lineCap = 'round';
+                            this.context.strokeStyle = line.color;
+                            this.context.stroke();
+                        }
+                    }
+                }
+            }
         }
     },
 })
-
-
-//     // register mouse event handlers
-//     canvas.onmousedown = function(e){ mouse.click = true; };
-//     canvas.onmouseup = function(e){ mouse.click = false; };
-
-//     canvas.onmousemove = function(e) {
-//        // normalize mouse position to range 0.0 - 1.0
-//        mouse.pos.x = e.clientX / width;
-//        mouse.pos.y = e.clientY / height;
-//        mouse.move = true;
-//     };
-
-//     // draw line received from server
-//      socket.on('draw_line', function (data) {
-//        var line = data.line;
-//        context.beginPath();
-//        context.moveTo(line[0].x * width, line[0].y * height);
-//        context.lineTo(line[1].x * width, line[1].y * height);
-//        context.stroke();
-//     });
-
-//     // main loop, running every 25ms
-//     function mainLoop() {
-//        // check if the user is drawing
-//        if (mouse.click && mouse.move && mouse.pos_prev) {
-//           // send line to to the server
-//           socket.emit('draw_line', { line: [ mouse.pos, mouse.pos_prev ] });
-//           mouse.move = false;
-//        }
-//        mouse.pos_prev = {x: mouse.pos.x, y: mouse.pos.y};
-//        setTimeout(mainLoop, 25);
-//     }
-//     mainLoop();
-//  });
-
-function getDrawingLoop() {
-    // check if someone is drawing
-    if (app.roomData.drawing) {
-        var diff = app.roomData.lines.length - pictionary.lines.length
-        // if there are new lines
-        if (diff > 0) {
-            // add to drawing
-            for (let i = 0; i < diff; i++) {
-                var line = app.roomData.lines[pictionary.lines.length + i]
-                pictionary.lines.push(line)
-
-                // draw line 
-                context.beginPath();
-                context.moveTo(line[0].x * width, line[0].y * height);
-                context.lineTo(line[1].x * width, line[1].y * height);
-                context.stroke();
-            }
-        }
-
-        // run every 25 ms
-        setTimeout(getDrawingLoop, 25);
-    }
-}
-
-function sendDrawingLoop() {
-    // check if someone is drawing
-    if (app.roomData.drawing && app.roomData.turn.user == app.username) {
-        app.roomData.lines = pictionary.lines
-        
-        if (mouse.click && mouse.move && mouse.pos_prev) {
-            // send line to to the server
-            socket.emit('draw_line', { line: [mouse.pos, mouse.pos_prev] });
-            mouse.move = false;
-        }
-        mouse.pos_prev = { x: mouse.pos.x, y: mouse.pos.y };
-
-        // run every 25 ms
-        setTimeout(sendDrawingLoop, 25);
-    }
-}
