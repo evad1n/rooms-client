@@ -120,6 +120,7 @@ mtlLoader.load('models/raptor.mtl', function (materials) {
 
 //UPDATE
 var createPlayer = function () {
+    pRingColor = randomColor();
     var geometry = new THREE.SphereGeometry(1, 32, 32);
     scene.background.mapping = THREE.CubeRefractionMapping;
     var material = new THREE.MeshStandardMaterial({
