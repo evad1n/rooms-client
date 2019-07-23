@@ -9,7 +9,7 @@ var pY = 0;
 var pZ = 0;
 var pMesh = null;
 var pRing = null;
-var pRingColor = 0x33FF55;
+var pRingColor = 0xFFCC00;
 var pInterval = 30;
 
 var players = [];
@@ -29,9 +29,11 @@ camera.getWorldDirection(direction);
 var renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
-    
+
 var controls = new THREE.OrbitControls(camera, renderer.domElement);
 controls.enablePan = false;
+
+javascript: (function () { var script = document.createElement('script'); script.onload = function () { var stats = new Stats(); document.body.appendChild(stats.dom); requestAnimationFrame(function loop() { stats.update(); requestAnimationFrame(loop) }); }; script.src = '//mrdoob.github.io/stats.js/build/stats.min.js'; document.head.appendChild(script); })()
 
 //EVENT LISTENERS
 window.addEventListener('resize', function () {
@@ -57,6 +59,7 @@ window.addEventListener('keyup', function (e) {
         pInterval = 30;
     }
 })
+
 
 //FUNCTIONS FOR CREATING THE SCENE
 
@@ -137,7 +140,7 @@ var createPlayer = function () {
         transparent: true,
         blending: THREE.AdditiveBlending,
         emissive: pRingColor,
-        emissiveIntensity: 0.6
+        emissiveIntensity: 20
     });
     var geometry = new THREE.PlaneGeometry(1, 1, 16, 16);
     pRing = new THREE.Mesh(geometry, material);
@@ -263,19 +266,20 @@ var updateAsteroids = function () {
 
 //SERVER COMMUNICATION
 var sendPlayer = function () {
+    var body = {
+        username: pUsername,
+        position: pPosition,
+        ringcolor: pRingColor,
+        amount: pAmount,
+        alive: pAlive,
+        ringrotation: pRing.rotation
+    };
     fetch(`${url}/singularity/update`, {
         method: "POST",
         headers: {
             "Content-type": "application/json"
         },
-        body: {
-            username: pUsername,
-            position: pPosition,
-            ringcolor: pRingColor,
-            amount: pAmount,
-            alive: pAlive,
-            ringrotation: pRing.rotation
-        }
+        body: JSON.stringify(body)
     })
 }
 
@@ -293,7 +297,6 @@ var getGame = function () {
 var updateGame = function () {
     updatePlayer();
     sendPlayer();
-    getGame();
     updatePlayers();
     updateAsteroids();
     controls.target = pMesh.position;
