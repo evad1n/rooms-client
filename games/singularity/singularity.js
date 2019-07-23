@@ -1,5 +1,3 @@
-const url = 'http://localhost:3000';
-
 var pUsername = "Antoine";
 var pPosition = { x: 0, y: 0, z: 0 };
 var pRotation = { x: 0, y: 0, z: 0 };
