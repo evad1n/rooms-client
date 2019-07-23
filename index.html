@@ -27,6 +27,8 @@
                     <div class="toolbar-divider"></div>
                     <PrivateRoomCategory v-bind:title="'Messaging'" v-bind:type="'messages'"></PrivateRoomCategory>
                     <div class="toolbar-divider"></div>
+                    <v-btn flat v-on:click="switchRoom('singularity')">Singularity</v-btn>
+                    <div class="toolbar-divider"></div>
                     <PrivateRoomCategory v-bind:title="'Game Rooms'" v-bind:type="'games'"></PrivateRoomCategory>
                     <div class="toolbar-divider"></div>
                 </v-toolbar-items>
@@ -107,6 +109,11 @@
                 </v-layout>
             </v-container>
 
+            <!-- HOME -->
+            <v-container v-if="page == 'singularity'" grid-list-xl fluid>
+                <div id="blackhole"></div>
+            </v-container>
+            
             <!--GAMES-->
             <v-container v-for="(room, index) in Object.keys(privateGameRooms)" v-if="page == room" grid-list-xl fluid>
                 <v-card-title class="display-1 justify-center text-uppercase">
@@ -289,6 +296,9 @@
                         </v-card>
                     </v-flex>
 
+                    <!-- GO -->
+                    
+
                     <!-- SIDEBAR -->
                     <v-flex xs4 pt-0>
                         <v-card v-bind:color="secondaryColor">
@@ -310,5 +320,7 @@
 <script src="games/pictionary.js"></script>
 <script src="games/tictactoe.js"></script>
 <script src="games/go.js"></script>
-
+<script src="games/singularity/three.js"></script>
+<script src="games/singularity/extensions/OrbitControls.js"></script>
+<script src="games/singularity/singularity.js"></script>
 </html>
