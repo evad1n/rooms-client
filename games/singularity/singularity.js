@@ -293,11 +293,11 @@ var getGame = function () {
 var updateGame = function () {
     updatePlayer();
     sendPlayer();
+    getGame();
     updatePlayers();
-    //updateAsteroids();
+    updateAsteroids();
     controls.target = pMesh.position;
     controls.update();
-    //sendPlayer();
 }
 
 var render = function () {
