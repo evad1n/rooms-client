@@ -289,8 +289,11 @@ var getGame = function () {
         res.json().then(function (data) {
             players = data.players;
             asteroids = data.asteroids;
-            systems = data.systems;
-            nebulas = data.nebulas;
+            data.asteroids.forEach(function (asteroid1) {
+                asteroids.forEach(function (asteroid2) {
+                    asteroid2.alive = asteroid1.alive
+                })
+            })
         });
     })
 }
