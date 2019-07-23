@@ -17,51 +17,51 @@ var asteroids = [];
 var systems = [];
 var nebulas = [];
 
-var scene = new THREE.Scene();
-var spaceTextures = ['games/singularity/images/outerspace_left.png', 'games/singularity/images/outerspace_right.png', 'games/singularity/images/outerspace_up.png', 'games/singularity/images/outerspace_down.png', 'games/singularity/images/outerspace_front.png', 'games/singularity/images/outerspace_back.png'];
-//var spaceTextures = ['images/space_1_left.png', 'images/space_1_right.png', 'images/space_1_up.png', 'images/space_1_down.png', 'images/space_1_front.png', 'images/space_1_back.png'];
-scene.background = new THREE.CubeTextureLoader().load(spaceTextures);
 
-var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 3000);
-var direction = new THREE.Vector3();
-camera.getWorldDirection(direction);
-
-var renderer = new THREE.WebGLRenderer({ antialias: true });
-renderer.setSize(window.innerWidth, window.innerHeight);
 if (app.page == "singularity") {
-    document.body.appendChild(renderer.domElement);
-}
+    var scene = new THREE.Scene();
+    var spaceTextures = ['games/singularity/images/outerspace_left.png', 'games/singularity/images/outerspace_right.png', 'games/singularity/images/outerspace_up.png', 'games/singularity/images/outerspace_down.png', 'games/singularity/images/outerspace_front.png', 'games/singularity/images/outerspace_back.png'];
+    //var spaceTextures = ['images/space_1_left.png', 'images/space_1_right.png', 'images/space_1_up.png', 'images/space_1_down.png', 'images/space_1_front.png', 'images/space_1_back.png'];
+    scene.background = new THREE.CubeTextureLoader().load(spaceTextures);
 
-var controls = new THREE.OrbitControls(camera, renderer.domElement);
-controls.enablePan = false;
+    var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 3000);
+    var direction = new THREE.Vector3();
+    camera.getWorldDirection(direction);
 
-javascript: (function () { var script = document.createElement('script'); script.onload = function () { var stats = new Stats(); document.body.appendChild(stats.dom); requestAnimationFrame(function loop() { stats.update(); requestAnimationFrame(loop) }); }; script.src = '//mrdoob.github.io/stats.js/build/stats.min.js'; document.head.appendChild(script); })()
-
-//EVENT LISTENERS
-window.addEventListener('resize', function () {
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
+    var renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
-})
+    document.body.appendChild(renderer.domElement);
+    
+    var controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.enablePan = false;
 
-window.addEventListener('keydown', function (e) {
-    if (e.which == 87) {
-        pX -= 1;
-    } else if (e.which == 83) {
-        pX += 1;
-    }
+    javascript: (function () { var script = document.createElement('script'); script.onload = function () { var stats = new Stats(); document.body.appendChild(stats.dom); requestAnimationFrame(function loop() { stats.update(); requestAnimationFrame(loop) }); }; script.src = '//mrdoob.github.io/stats.js/build/stats.min.js'; document.head.appendChild(script); })()
 
-    if (e.which == 16) {
-        pInterval = 20;
-    }
-})
+    //EVENT LISTENERS
+    window.addEventListener('resize', function () {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+    })
 
-window.addEventListener('keyup', function (e) {
-    if (e.which == 16) {
-        pInterval = 30;
-    }
-})
+    window.addEventListener('keydown', function (e) {
+        if (e.which == 87) {
+            pX -= 1;
+        } else if (e.which == 83) {
+            pX += 1;
+        }
 
+        if (e.which == 16) {
+            pInterval = 20;
+        }
+    })
+
+    window.addEventListener('keyup', function (e) {
+        if (e.which == 16) {
+            pInterval = 30;
+        }
+    })
+}
 
 //FUNCTIONS FOR CREATING THE SCENE
 
