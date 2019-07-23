@@ -9,7 +9,7 @@ var pY = 0;
 var pZ = 0;
 var pMesh = null;
 var pRing = null;
-var pRingColor = 0x338855;
+var pRingColor = 0x33FF55;
 var pInterval = 30;
 
 var players = [];
@@ -137,7 +137,7 @@ var createPlayer = function () {
         transparent: true,
         blending: THREE.AdditiveBlending,
         emissive: pRingColor,
-        emissiveIntensity: 20
+        emissiveIntensity: 0.6
     });
     var geometry = new THREE.PlaneGeometry(1, 1, 16, 16);
     pRing = new THREE.Mesh(geometry, material);
