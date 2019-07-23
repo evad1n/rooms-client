@@ -287,8 +287,11 @@ var sendPlayer = function () {
 var getGame = function () {
     fetch(`${url}/singularity/visible/${pUsername}`).then(function (res) {
         res.json().then(function (data) {
-            players = data.players;
-            asteroids = data.asteroids;
+            data.players.forEach(function (player1) {
+                players.forEach(function (player2) {
+                    player2.alive = player1.alive
+                })
+            })
             data.asteroids.forEach(function (asteroid1) {
                 asteroids.forEach(function (asteroid2) {
                     asteroid2.alive = asteroid1.alive
