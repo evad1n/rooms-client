@@ -64,7 +64,7 @@ window.addEventListener('keyup', function (e) {
 //FUNCTIONS FOR CREATING THE SCENE
 
 var randomColor = function () {
-    color = "";
+    color = "0x";
     for (var c = 0; c < 6; c++) {
         num = Math.floor(Math.random() * 16)
         if (num < 10) {
