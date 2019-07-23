@@ -12,38 +12,10 @@ var pRing = null;
 var pRingColor = 0xFFCC00;
 var pInterval = 30;
 
-var players = [
-    {
-        username: "James",
-        position: { x: 5, y: 0, z: -32 },
-        ringcolor: 0xFF0000,
-        amount: 47,
-        alive: true,
-        ringrotation: { x: 0, y: 0, z: 0 }
-    },
-    {
-        username: "Japmes",
-        position: { x: -19, y: 0, z: 0 },
-        ringcolor: 0x00FF00,
-        amount: 16,
-        alive: true,
-        ringrotation: { x: 2, y: -1, z: 0 }
-    },
-    {
-        username: "Jamppes",
-        position: { x: 1, y: 0, z: 16 },
-        ringcolor: 0xFF00FF,
-        amount: 9,
-        alive: true,
-        ringrotation: { x: -3, y: 4, z: 0 }
-    },
-];
-
-var asteroidAmount = 5000;
+var players = [];
 var asteroids = [];
-
-var starAmount = 100;
-var stars = [];
+var systems = [];
+var nebulas = [];
 
 var scene = new THREE.Scene();
 var spaceTextures = ['images/outerspace_left.png', 'images/outerspace_right.png', 'images/outerspace_up.png', 'images/outerspace_down.png', 'images/outerspace_front.png', 'images/outerspace_back.png'];
@@ -127,56 +99,6 @@ var createAmbientLight = function () {
     scene.add(ambientlight);
 }
 
-/*var createAsteroids = function () {
-    var asteroids = [];
-
-    for (var l = 0; l < 50; l++) {
-        var location = {
-            x: (Math.random() * 5000) - (Math.random() * 5000),
-            y: (Math.random() * 5000) - (Math.random() * 5000),
-            z: (Math.random() * 5000) - (Math.random() * 5000),
-            a: Math.floor((Math.random() * 10))
-        };
-        locations.push(location);
-    }
-
-    for (var i = 0; i < asteroidAmount; i++) {
-        var l_num = Math.floor(Math.random() * 50);
-        var amount = Math.sqrt(locations[l_num].a);
-        var geometry = new THREE.BoxGeometry(amount, amount, amount);
-        var material = new THREE.MeshLambertMaterial({ color: 0xAA5522 });
-        var mesh = new THREE.Mesh(geometry, material);
-
-        mesh.position.set(locations[l_num].x + ((Math.random() * 300) - (Math.random() * 300)), locations[l_num].y + ((Math.random() * 300) - (Math.random() * 300)), locations[l_num].z + ((Math.random() * 300) - (Math.random() * 300)));
-
-        var asteroid = {
-            amount: Math.sqrt(amount),
-            position: mesh.position,
-            alive: true,
-            mesh: mesh,
-            velocity: (Math.random() - Math.random())
-        };
-        asteroids.push(asteroid);
-        scene.add(asteroid.mesh);
-    }
-}*/
-
-/*var createMoons = function (planet) {
-    var amount = (planet.amount / 4) / createMoons.length;
-    var geometry = new THREE.SphereGeometry(1, 32, 32)
-    var material = new THREE.MeshPhongMaterial({ color: randomColor() })
-}
-
-var createStar = function () {
-    var geometry = new THREE.SphereGeometry(9, 32, 32);
-    var material = new THREE.MeshLambertMaterial({
-        color: 0xFF0000,
-    })
-    var mesh = new THREE.Mesh(geometry, material);
-    mesh.position.set(15, 20, 4);
-    scene.add(mesh);
-}*/
-
 var createScene = function () {
     createSun();
     createAmbientLight();
@@ -199,7 +121,6 @@ mtlLoader.load('models/raptor.mtl', function (materials) {
 //UPDATE
 var createPlayer = function () {
     var geometry = new THREE.SphereGeometry(1, 32, 32);
-    var blackhole = new THREE.CubeTextureLoader().load(spaceTextures);
     scene.background.mapping = THREE.CubeRefractionMapping;
     var material = new THREE.MeshStandardMaterial({
         roughness: 0,
@@ -361,9 +282,21 @@ var sendPlayer = function () {
     })
 }
 
+var getGame = function () {
+    fetch(`${url}/singularity/update/${pUsername}`).then(function (res) {
+        res.json().then(function (data) {
+            players = data.players;
+            asteroids = data.asteroids;
+            systems = data.systems;
+            nebulas = data.nebulas;
+        });
+    })
+}
+
 var updateGame = function () {
     updatePlayer();
     sendPlayer();
+    getGame();
     updatePlayers();
     //updateAsteroids();
     controls.target = pMesh.position;
