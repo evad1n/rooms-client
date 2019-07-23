@@ -28,7 +28,7 @@ camera.getWorldDirection(direction);
 
 var renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
-if (page == "singularity") {
+if (app.page == "singularity") {
     document.body.appendChild(renderer.domElement);
 }
 
