@@ -28,7 +28,9 @@ camera.getWorldDirection(direction);
 
 var renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
-document.querySelector("main").appendChild(renderer.domElement);
+if (page == "singularity") {
+    document.body.appendChild(renderer.domElement);
+}
 
 var controls = new THREE.OrbitControls(camera, renderer.domElement);
 controls.enablePan = false;
