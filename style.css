@@ -15,13 +15,6 @@
     margin-top: calc(50vh - 250px);
 }
 
-#title {
-    padding-right: 20px;
-    padding-top: 18px;
-    border-right: solid 2px rgba(0,0,0,.54);
-    height: 100%;
-}
-
 .toolbar-divider {
     background-color: rgba(0,0,0,.54);
     width: 2.5px;
@@ -31,6 +24,7 @@
 .list > div:not(:first-child){
     border-top: 2px solid rgba(0,0,0,.54);
     background-color: #AED581;
+    padding-bottom: 10px;
 }
 
 .user-search {
@@ -125,7 +119,7 @@
     width: var(--box-size);
     height: var(--box-size);
     border: 2px solid black;
-    font-size: 5rem;
+    font-size: 4rem;
     color: black;
     background-color: #AED581;
     text-align: center;

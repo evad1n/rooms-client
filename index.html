@@ -14,30 +14,28 @@
 </head>
 
 <div id="app" v-cloak>
-    <v-app light>
+    <v-app>
         <v-content>
 
             <!-- TOOLBAR -->
             <v-app-bar v-bind:color="primaryColor" v-if="page != 'login'">
-                <v-toolbar-title id="title">ROOMS</v-toolbar-title>
-                <v-toolbar-title>{{app.username}}</v-toolbar-title>
+                <v-toolbar-title class="mr-4" id="title">ROOMS</v-toolbar-title>
+                <v-toolbar-items class="display-1">
+                    <div class="toolbar-divider"></div>
+                </v-toolbar-items>
+                <v-toolbar-title class="ml-4">{{app.username}}</v-toolbar-title>
                 <v-spacer></v-spacer>
                 <v-toolbar-items class="display-1">
                     <v-btn text v-on:click="switchRoom('home')">HOME</v-btn>
                     <div class="toolbar-divider"></div>
-                    <PrivateRoomCategory v-bind:title="'Messaging'" v-bind:type="'messages'"></PrivateRoomCategory>
+                    <v-btn text v-on:click="switchRoom('home')">Singularity</v-btn>
                     <div class="toolbar-divider"></div>
-                    <v-btn text v-on:click="switchRoom('singularity')">Singularity</v-btn>
+                    <PrivateRoomCategory v-bind:title="'Messaging'" v-bind:type="'messages'"></PrivateRoomCategory>
                     <div class="toolbar-divider"></div>
                     <PrivateRoomCategory v-bind:title="'Game Rooms'" v-bind:type="'games'"></PrivateRoomCategory>
                     <div class="toolbar-divider"></div>
                 </v-toolbar-items>
             </v-app-bar>
-
-            <!-- WELCOME TEXT -->
-            <v-card-title class="display-1 justify-center px-0 pb-0" v-if="page != 'login' && welcome">Welcome
-                {{username}}!
-            </v-card-title>
 
             <!-- LOGIN -->
             <v-container v-if="page == 'login'">
@@ -48,14 +46,14 @@
                         <v-card id="login" elevation="18" v-bind:color="primaryColor">
                             <v-card-title class="display-1 justify-center">Enter a Username</v-card-title>
                             <v-card-text>
-                                <v-text-field hide-details outlined label="name" v-model="testUsername" v-bind:color="secondaryColor"
-                                    @keyup.enter="checkUsername()">
+                                <v-text-field hide-details outlined label="name" v-model="testUsername"
+                                    v-bind:color="secondaryColor" @keyup.enter="checkUsername()">
                                 </v-text-field>
                             </v-card-text>
                             <v-card-actions>
                                 <v-btn block @click="checkUsername()" v-bind:color="secondaryColor">enter</v-btn>
                             </v-card-actions>
-                            <v-card-text v-if="badName" class="subheading text-xs-center red">That username is already
+                            <v-card-text v-if="badName" class="subtitle-1 text-center red">That username is already
                                 taken</v-card-text>
                         </v-card>
                     </v-flex>
@@ -64,12 +62,12 @@
             </v-container>
 
             <!-- HOME -->
-            <v-container v-if="page == 'home'" grid-list-xl fluid>
+            <v-container v-if="page == 'home'" grid-list-xl container--fluid>
                 <v-layout>
                     <v-flex xs3>
                         <v-card elevation="18" v-bind:color="primaryColor" class="list">
-                            <v-card-title class="subheading justify-center">YOUR INVITES</v-card-title>
-                            <div v-for="invite in invites" class="text-xs-center" v-bind:color="tertiaryColor">
+                            <v-card-title class="subtitle-1 justify-center">Your Invites</v-card-title>
+                            <div v-for="invite in invites" class="text-center" v-bind:color="tertiaryColor">
                                 <v-card-text>{{formatInvite(invite)}}</v-card-text>
                                 <v-btn @click="respondInvite(invite, true)" v-bind:color="secondaryColor">Accept</v-btn>
                                 <v-btn @click="respondInvite(invite, false)" v-bind:color="secondaryColor">Decline
@@ -83,8 +81,8 @@
                     </v-flex>
                     <v-flex xs3>
                         <v-card elevation="18" v-bind:color="primaryColor" class="list">
-                            <v-card-title class="subheading justify-center">Create Game Room</v-card-title>
-                            <div v-for="game in games" class="text-xs-center" v-bind:color="tertiaryColor">
+                            <v-card-title class="subtitle-1 justify-center">Create Game Room</v-card-title>
+                            <div v-for="game in games" class="text-center" v-bind:color="tertiaryColor">
                                 <v-card-text class="center">{{game.toUpperCase()}}</v-card-text>
                                 <v-btn @click="createGameRoom(game)" v-bind:color="secondaryColor"
                                     class="justify-center">Create</v-btn>
@@ -96,7 +94,7 @@
 
             <!-- PRIVATE MESSAGING -->
             <v-container v-for="(room, index) in Object.keys(privateMessageRooms)" v-if="page == room" grid-list-xl
-                fluid>
+                container--fluid>
                 <v-layout>
                     <v-flex xs3>
                         <UserSearch v-if="getRoomHost(room) == username"></UserSearch>
@@ -109,13 +107,14 @@
                 </v-layout>
             </v-container>
 
-            <!-- HOME -->
-            <v-container v-if="page == 'singularity'" grid-list-xl fluid>
+            <!-- SINGULARITY -->
+            <v-container v-if="page == 'singularity'" grid-list-xl container--fluid>
                 <div id="blackhole"></div>
             </v-container>
-            
+
             <!--GAMES-->
-            <v-container v-for="(room, index) in Object.keys(privateGameRooms)" v-if="page == room" grid-list-xl fluid>
+            <v-container v-for="(room, index) in Object.keys(privateGameRooms)" v-if="page == room" grid-list-xl
+                container--fluid>
                 <v-card-title class="display-1 justify-center text-uppercase">
                     {{privateGameRooms[room].name}}</v-card-title>
 
@@ -151,24 +150,25 @@
                                 <v-flex xs4>
                                     <v-layout column>
                                         <v-flex xs2>
-                                            <p v-if="app.roomData.timer" class="text-xs-center">Time Left: {{Math.floor(app.roomData.timer.seconds)}}</p>
+                                            <p v-if="app.roomData.timer" class="text-center">Time Left:
+                                                {{Math.floor(app.roomData.timer.seconds)}}</p>
                                         </v-flex>
                                         <v-flex xs4>
-                                            <h4 class="text-xs-center" py-0>SCORE</h4>
+                                            <h4 class="text-center" py-0>SCORE</h4>
                                             <v-divider></v-divider>
-                                            <p class="text-xs-center scores">
+                                            <p class="text-center scores">
                                                 <span v-for="player in app.roomData.players">{{player.name}}:
                                                     {{player.score}} &emsp;</span>
                                             </p>
                                         </v-flex>
                                         <v-flex xs2>
-                                            <p class="text-xs-center"
+                                            <p class="text-center"
                                                 v-if="app.roomData.started && app.roomData.turn.user == app.username && app.roomData.winner == 'none'">
                                                 It
                                                 is
                                                 Your
                                                 Turn</p>
-                                            <p class="text-xs-center"
+                                            <p class="text-center"
                                                 v-if="app.roomData.started && app.roomData.turn.user != app.username && app.roomData.winner == 'none'">
                                                 It
                                                 is
@@ -224,7 +224,7 @@
                                 <v-flex xs4 py-0>
                                     <v-layout column justify-space-between fill-height>
                                         <v-flex xs2>
-                                            <p class="text-xs-center" py-0>
+                                            <p class="text-center" py-0>
                                                 <span v-if="app.roomData.started && app.roomData.winner == 'none'">Game
                                                     has
                                                     started!</span>
@@ -237,15 +237,15 @@
                                         </v-flex>
 
                                         <v-flex xs2 py-0>
-                                            <h4 class="text-xs-center" py-0>SCORE</h4>
+                                            <h4 class="text-center" py-0>SCORE</h4>
                                             <v-divider></v-divider>
-                                            <p class="text-xs-center scores">
+                                            <p class="text-center scores">
                                                 <span v-for="player in app.roomData.players">{{player.name}}:
                                                     {{player.score}} &emsp;</span>
                                             </p>
                                         </v-flex>
 
-                                        <v-flex xs4 py-0>
+                                        <v-flex xs4 py-0 style="height: 45px">
                                             <p pa-0>
                                                 <p v-if="!app.roomData.started">
                                                     Ready players:
@@ -255,13 +255,13 @@
                                                     </span>
                                                 </p>
 
-                                                <p class="text-xs-center"
+                                                <p class="text-center"
                                                     v-if="app.roomData.started && app.roomData.turn.user == app.username && app.roomData.winner == 'none'">
                                                     It
                                                     is
                                                     Your
                                                     Turn</p>
-                                                <p class="text-xs-center"
+                                                <p class="text-center"
                                                     v-if="app.roomData.started && app.roomData.turn.user != app.username && app.roomData.winner == 'none'">
                                                     It
                                                     is
@@ -319,4 +319,5 @@
 <!-- <script src="games/singularity/three.js"></script>
 <script src="games/singularity/extensions/OrbitControls.js"></script>
 <script src="games/singularity/singularity.js"></script> -->
+
 </html>

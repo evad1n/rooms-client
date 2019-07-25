@@ -38,9 +38,9 @@ var PrivateRoomCategory = {
                         </v-btn>
                     </template>
                     <v-list>
-                        <v-list-tile v-for="(room, index) in app.rooms.filter(isType)" :key="index" @click="app.switchRoom(room)">
-                            <v-list-tile-title>{{app.getRoomName(room)}}</v-list-tile-title>
-                        </v-list-tile>
+                        <v-list-item v-for="(room, index) in app.rooms.filter(isType)" :key="index" @click="app.switchRoom(room)">
+                            <v-list-item-title>{{app.getRoomName(room)}}</v-list-item-title>
+                        </v-list-item>
                     </v-list>
                 </v-menu>`
 }
@@ -130,36 +130,52 @@ var Messaging = {
     template: `<v-card elevation="18" v-bind:color="app.primaryColor" light>
                     <v-card-title class="font-weight-bold headline justify-center text-uppercase">Chat</v-card-title>
                     <v-flex xs12 v-if="canInvite()" class="user-search" py-0 align-content-center>
-                        <p class="ma-0 mt-3">Add User</p>
-                        <v-autocomplete v-model="addSearchQuery" :items="invitableUsers" no-data-text="No Users" color="black" dense width="150px">
-                            <template v-slot:append-outer>
-                                <v-slide-x-reverse-transition mode="out-in">
-                                </v-slide-x-reverse-transition>
-                            </template>
-                        </v-autocomplete>
-                        <v-btn block v-bind:disabled="addSearchQuery == '' || invitableUsers.length == 0" @click="invite(addSearchQuery)" v-bind:color="app.secondaryColor">Invite</v-btn>
+                        <v-layout>
+                            <v-flex xs3>
+                                <p class="mt-3">Add User</p>
+                            </v-flex>
+                            <v-flex xs6>
+                                <v-autocomplete outlined v-model="addSearchQuery" :items="invitableUsers" no-data-text="No Users" color="black" dense width="150px">
+                                    <template v-slot:append-outer>
+                                        <v-slide-x-reverse-transition mode="out-in">
+                                        </v-slide-x-reverse-transition>
+                                    </template>
+                                </v-autocomplete>
+                            </v-flex>
+                            <v-flex xs3>
+                                <v-btn class="mt-2 float-right" v-bind:disabled="addSearchQuery == '' || invitableUsers.length == 0" @click="invite(addSearchQuery)" v-bind:color="app.secondaryColor">Invite</v-btn>
+                            </v-flex>
+                        </v-layout>
                     </v-flex>
                     <v-flex xs12 v-if="canRemove" class="user-search" py-0 align-content-center>
-                        <p class="ma-0 mt-3">Remove User</p>
-                        <v-autocomplete v-model="removeSearchQuery" :items="removableUsers" no-data-text="No Users" color="black" dense width="150px">
-                            <template v-slot:append-outer>
-                                <v-slide-x-reverse-transition mode="out-in">
-                                </v-slide-x-reverse-transition>
-                            </template>
-                        </v-autocomplete>
-                        <v-btn block v-bind:disabled="removeSearchQuery == ''" @click="remove(removeSearchQuery)" v-bind:color="app.secondaryColor">Kick</v-btn>
+                        <v-layout>
+                            <v-flex xs3>
+                                <p class="mt-3">Remove User</p>
+                            </v-flex>
+                            <v-flex xs6>
+                                <v-autocomplete outlined v-model="removeSearchQuery" :items="removableUsers" no-data-text="No Users" color="black" dense width="150px">
+                                    <template v-slot:append-outer>
+                                        <v-slide-x-reverse-transition mode="out-in">
+                                        </v-slide-x-reverse-transition>
+                                    </template>
+                                </v-autocomplete>
+                            </v-flex>
+                            <v-flex xs3>
+                                <v-btn class="mt-2 float-right" v-bind:disabled="removeSearchQuery == ''" @click="remove(removeSearchQuery)" v-bind:color="app.secondaryColor">Kick</v-btn>
+                            </v-flex>
+                        </v-layout>
                     </v-flex>
                     <div v-chat-scroll="{always: false, smooth: true}" v-if="app.roomData.messageHistory.length > 0" class="messages-container">
                         <p v-for="(message, index) in app.roomData.messageHistory" :key="index">
                             {{message.user}}: {{message.text}}
                         </p>
                     </div>
-                    <div>
+                    <v-card-text px-3>
                         <v-text-field hide-details outlined label="Type a message" v-model="newMessage" v-bind:color="app.secondaryColor"
                             @keyup.enter="sendMessage({user: app.username, text: newMessage})">
                         </v-text-field>
                         Current users:<span v-for="user in app.roomData.users"> {{user}}<span v-if="!isLast(user, app.roomData.users)">,</span></span>
-                    </div>
+                    </v-card-text>
                     <v-card-actions>
                         <v-btn block @click="sendMessage({user: app.username, text: newMessage})" v-bind:color="app.secondaryColor">send</v-btn>
                     </v-card-actions>
@@ -191,7 +207,6 @@ var app = new Vue({
         },
         privateGameRooms: {
         },
-        welcome: true,
         testUsername: "",
         username: "",
         rooms: [],
@@ -263,7 +278,6 @@ var app = new Vue({
                                     },
                                     body: JSON.stringify({ user: app.username })
                                 }).then(function () {
-                                    app.welcome = true
                                     app.page = "home"
                                     app.getRoomData()
 
@@ -358,7 +372,6 @@ var app = new Vue({
             }).then(function () {
                 app.page = room;
                 app.getRoomData()
-                app.welcome = false
 
                 //remove user from old room
                 fetch(`${url}/${oldRoom}/users`, {
