@@ -28,7 +28,7 @@ camera.getWorldDirection(direction);
 
 var renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
-document.querySelector("#blackhole").appendChild(renderer.domElement);
+document.body.appendChild(renderer.domElement);
 
 var controls = new THREE.OrbitControls(camera, renderer.domElement);
 controls.enablePan = false;
@@ -120,7 +120,6 @@ mtlLoader.load('models/raptor.mtl', function (materials) {
 
 //UPDATE
 var createPlayer = function () {
-    pRingColor = randomColor();
     var geometry = new THREE.SphereGeometry(1, 32, 32);
     scene.background.mapping = THREE.CubeRefractionMapping;
     var material = new THREE.MeshStandardMaterial({
@@ -143,6 +142,8 @@ var createPlayer = function () {
         emissive: pRingColor,
         emissiveIntensity: 0.6
     });
+    material.color.setHex(randomColor())
+    pRingColor = material.color;
     var geometry = new THREE.PlaneGeometry(1, 1, 16, 16);
     pRing = new THREE.Mesh(geometry, material);
     pRing.rotation.x = -1;
@@ -242,26 +243,35 @@ var updatePlayers = function () {
 
 
 var updateAsteroids = function () {
-    asteroids.forEach(function (asteroid) {
-        if (asteroid.alive) {
-            if (typeof asteroid.mesh === 'undefined') {
-                var geometry = new THREE.BoxGeometry(amount, amount, amount);
+    for (var field = 0; field < asteroids.length; field++) {
+        asteroids[field].asteroids.forEach(function (asteroid) {
+            if (asteroid.alive) {
+                var geometry = new THREE.BoxGeometry(asteroid.amount, asteroid.amount, asteroid.amount);
                 var material = new THREE.MeshLambertMaterial({ color: 0xAA5522 });
-                mesh.position.set(asteroid.position.x, asteroid.position.y, asteroid.position.z);
-                mesh.scale.set(asteroid.amount,asteroid.amount,asteroid.amount);
                 var mesh = new THREE.Mesh(geometry, material);
+                scene.add(mesh);
+                if (typeof asteroid.mesh === 'undefined') {
+                    var geometry = new THREE.BoxGeometry(asteroid.amount, asteroid.amount, asteroid.amount);
+                    var material = new THREE.MeshLambertMaterial({ color: 0xAA5522 });
+                    var mesh = new THREE.Mesh(geometry, material);
+                    mesh.position.set(asteroid.position.x, asteroid.position.y, asteroid.position.z);
+                    scene.add(mesh);
+                    asteroid.mesh = mesh;
+
+                } else {
+                    asteroid.mesh.rotation.x += asteroid.velocity * 0.05;
+                    asteroid.mesh.rotation.y += asteroid.velocity * 0.05;
+                    asteroid.mesh.rotation.z += asteroid.velocity * 0.05;
+                }
             } else {
-                asteroid.mesh.rotation.x += asteroid.velocity * 0.05;
-                asteroid.mesh.rotation.y += asteroid.velocity * 0.05;
-                asteroid.mesh.rotation.z += asteroid.velocity * 0.05;
-                mesh.position.set(asteroid.position.x, asteroid.position.y, asteroid.position.z);
+                if (typeof asteroid.mesh !== 'undefined') {
+                    scene.remove(asteroid.mesh);
+                    asteroid.mesh.geometry.dispose();
+                    asteroid.mesh.material.dispose();
+                }
             }
-        } else {
-            scene.remove(asteroid.mesh);
-            asteroid.mesh.geometry.dispose();
-            asteroid.mesh.material.dispose();
-        }
-    })
+        })
+    }
 }
 
 
@@ -287,15 +297,20 @@ var sendPlayer = function () {
 var getGame = function () {
     fetch(`${url}/singularity/visible/${pUsername}`).then(function (res) {
         res.json().then(function (data) {
-            data.players.forEach(function (player1) {
-                players.forEach(function (player2) {
-                    player2.alive = player1.alive
-                })
-            })
-            data.asteroids.forEach(function (asteroid1) {
-                asteroids.forEach(function (asteroid2) {
-                    asteroid2.alive = asteroid1.alive
-                })
+            data.asteroids.forEach(function (asteroidi) {
+                if (asteroids.length == 0) {
+                    asteroids.push(asteroidi);
+                } else {
+                    asteroids.forEach(function (asteroidm) {
+                        if (asteroidm.id == asteroidi.id) {
+                            asteroidm.alive = asteroidi.alive;
+                            asteroidm.amount = asteroidi.amount;
+                            asteroidm.position = asteroidi.position;
+                        } else {
+                            asteroids.push(asteroidi);
+                        }
+                    })
+                }
             })
         });
     })
