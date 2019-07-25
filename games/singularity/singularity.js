@@ -1,4 +1,4 @@
-var pUsername = "Antoine";
+var pUsername = app.username;
 var pPosition = { x: 0, y: 0, z: 0 };
 var pRotation = { x: 0, y: 0, z: 0 };
 var pAmount = 36;
@@ -202,7 +202,9 @@ var updatePlayer = function () {
         devour(player);
     })
     asteroids.forEach(function (asteroid) {
-        devour(asteroid);
+        asteroid.asteroids.forEach(function (rock) {
+            devour(rock);
+        })
     })
 
 
@@ -211,31 +213,35 @@ var updatePlayer = function () {
 var updatePlayers = function () {
     players.forEach(function (player) {
         //Mesh Creation
-        if (player.alive) {
-            if (typeof player.mesh === 'undefined') {
-                var geometry = new THREE.SphereGeometry(1, 32, 32);
-                var material = new THREE.MeshStandardMaterial({ roughness: 0, metalness: 1, refractionRatio: 0.8, envMap: scene.background });
-                player.mesh = new THREE.Mesh(geometry, material);
-                player.mesh.position.set(player.position.x, player.position.y, player.position.z);
-                player.mesh.scale.set(Math.sqrt(player.amount), Math.sqrt(player.amount), Math.sqrt(player.amount));
-                scene.add(player.mesh);
-
-                //var material = new THREE.MeshBasicMaterial({ color: player.ringcolor, map: new THREE.TextureLoader().load('images/ring.png'), side: THREE.DoubleSide, alphaTest: 0, transparent: true, opacity: 1, blending: THREE.AdditiveBlending });
-                //var geometry = new THREE.PlaneGeometry(1, 1, 1);
-                //player.ring = new THREE.Mesh(geometry, material);
-                //player.ring.position.set(player.position.x,player.position.y,player.position.z);
-                //player.ringrotation.z += 0.001;
-                //player.ring.rotation.set(player.ringrotation.x,player.ringrotation.y,player.ringrotation.z);
-                //player.ring.scale.set(Math.sqrt(player.amount) * 7, Math.sqrt(player.amount) * 7, Math.sqrt(player.amount) * 7);
-                //scene.add(player.ring);
+        if (pUsername !== player.username) {
+            if (player.alive) {
+                if (typeof player.mesh === 'undefined') {
+                    var geometry = new THREE.SphereGeometry(1, 32, 32);
+                    var material = new THREE.MeshStandardMaterial({ roughness: 0, metalness: 1, refractionRatio: 0.8, envMap: scene.background });
+                    player.mesh = new THREE.Mesh(geometry, material);
+                    player.mesh.position.set(player.position.x, player.position.y, player.position.z);
+                    player.mesh.scale.set(Math.sqrt(player.amount), Math.sqrt(player.amount), Math.sqrt(player.amount));
+                    scene.add(player.mesh);
+    
+                    //var material = new THREE.MeshBasicMaterial({ color: player.ringcolor, map: new THREE.TextureLoader().load('images/ring.png'), side: THREE.DoubleSide, alphaTest: 0, transparent: true, opacity: 1, blending: THREE.AdditiveBlending });
+                    //var geometry = new THREE.PlaneGeometry(1, 1, 1);
+                    //player.ring = new THREE.Mesh(geometry, material);
+                    //player.ring.position.set(player.position.x,player.position.y,player.position.z);
+                    //player.ringrotation.z += 0.001;
+                    //player.ring.rotation.set(player.ringrotation.x,player.ringrotation.y,player.ringrotation.z);
+                    //player.ring.scale.set(Math.sqrt(player.amount) * 7, Math.sqrt(player.amount) * 7, Math.sqrt(player.amount) * 7);
+                    //scene.add(player.ring);
+                } else {
+                    player.mesh.position.set(player.position.x, player.position.y, player.position.z);
+                    player.mesh.scale.set(Math.sqrt(player.amount), Math.sqrt(player.amount), Math.sqrt(player.amount));
+                }
             } else {
-                player.mesh.position.set(player.position.x, player.position.y, player.position.z);
-                player.mesh.scale.set(Math.sqrt(player.amount), Math.sqrt(player.amount), Math.sqrt(player.amount));
+                if (typeof player.mesh !== 'undefined') {
+                    scene.remove(player.mesh);
+                    player.mesh.geometry.dispose();
+                    player.mesh.material.dispose();
+                }
             }
-        } else {
-            scene.remove(player.mesh);
-            player.mesh.geometry.dispose();
-            player.mesh.material.dispose();
         }
     })
 }
@@ -246,22 +252,17 @@ var updateAsteroids = function () {
     for (var field = 0; field < asteroids.length; field++) {
         asteroids[field].asteroids.forEach(function (asteroid) {
             if (asteroid.alive) {
-                var geometry = new THREE.BoxGeometry(asteroid.amount, asteroid.amount, asteroid.amount);
-                var material = new THREE.MeshLambertMaterial({ color: 0xAA5522 });
-                var mesh = new THREE.Mesh(geometry, material);
-                scene.add(mesh);
                 if (typeof asteroid.mesh === 'undefined') {
                     var geometry = new THREE.BoxGeometry(asteroid.amount, asteroid.amount, asteroid.amount);
                     var material = new THREE.MeshLambertMaterial({ color: 0xAA5522 });
-                    var mesh = new THREE.Mesh(geometry, material);
-                    mesh.position.set(asteroid.position.x, asteroid.position.y, asteroid.position.z);
-                    scene.add(mesh);
-                    asteroid.mesh = mesh;
-
+                    asteroid.mesh = new THREE.Mesh(geometry, material);
+                    asteroid.mesh.position.set(asteroid.position.x, asteroid.position.y, asteroid.position.z);
+                    scene.add(asteroid.mesh);
+                    asteroid.velocity = Math.random() * 0.005;
                 } else {
-                    asteroid.mesh.rotation.x += asteroid.velocity * 0.05;
-                    asteroid.mesh.rotation.y += asteroid.velocity * 0.05;
-                    asteroid.mesh.rotation.z += asteroid.velocity * 0.05;
+                    asteroid.mesh.rotation.x += asteroid.velocity;
+                    asteroid.mesh.rotation.y += asteroid.velocity;
+                    asteroid.mesh.rotation.z += asteroid.velocity;
                 }
             } else {
                 if (typeof asteroid.mesh !== 'undefined') {
@@ -297,6 +298,25 @@ var sendPlayer = function () {
 var getGame = function () {
     fetch(`${url}/singularity/visible/${pUsername}`).then(function (res) {
         res.json().then(function (data) {
+            data.players.forEach(function (playeri) {
+                if (pUsername !== playeri.username) {
+                    if (players.length == 0) {
+                        players.push(playeri);
+                    } else {
+                        players.forEach(function (playerm) {
+                            if (playerm.username == playeri.username) {
+                                playerm.position = playeri.position;
+                                playerm.ringcolor = playeri.ringcolor;
+                                playerm.amount = playeri.amount;
+                                playerm.alive = playeri.alive;
+                                playerm.ringrotation = playeri.ringrotation;
+                            } else {
+                                players.push(playeri);
+                            }
+                        })
+                    }
+                }
+            })
             data.asteroids.forEach(function (asteroidi) {
                 if (asteroids.length == 0) {
                     asteroids.push(asteroidi);
