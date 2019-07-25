@@ -1,6 +1,9 @@
 // const url = 'https://server-rooms.herokuapp.com'
 const url = 'http://localhost:3000'
 
+const vuetifyOptions = { }
+Vue.use(Vuetify)
+
 const UPDATE_INTERVAL = 200
 
 var PrivateRoomCategory = {
@@ -168,6 +171,7 @@ var Messaging = {
 //MAIN APP
 var app = new Vue({
     el: "#app",
+    vuetify: new Vuetify(vuetifyOptions),
     components: {
         'messaging': Messaging,
         'privateroomcategory': PrivateRoomCategory,
