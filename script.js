@@ -1,7 +1,9 @@
-const url = 'https://server-rooms.herokuapp.com'
-// const url = 'http://localhost:3000'
+// const url = 'https://server-rooms.herokuapp.com'
+const url = 'http://localhost:3000'
 
 const UPDATE_INTERVAL = 200
+
+Vue.use(Vuetify)
 
 var PrivateRoomCategory = {
     name: 'PrivateRoomCategory',
@@ -31,7 +33,7 @@ var PrivateRoomCategory = {
     },
     template: `<v-menu offset-y>
                     <template v-slot:activator="{ on }">
-                        <v-btn flat v-on="on">
+                        <v-btn text v-on="on">
                             {{title}}
                         </v-btn>
                     </template>
@@ -125,7 +127,7 @@ var Messaging = {
     beforeDestroy() {
         clearInterval(this.timer)
     },
-    template: `<v-card elevation="18" v-bind:color="app.primaryColor">
+    template: `<v-card elevation="18" v-bind:color="app.primaryColor" light>
                     <v-card-title class="font-weight-bold headline justify-center text-uppercase">Chat</v-card-title>
                     <v-flex xs12 v-if="canInvite()" class="user-search" py-0 align-content-center>
                         <p class="ma-0 mt-3">Add User</p>
@@ -152,22 +154,22 @@ var Messaging = {
                             {{message.user}}: {{message.text}}
                         </p>
                     </div>
-                    <v-card-text class="pb-0">
-                        <v-text-field hide-details label="Type a message" v-model="newMessage" outline v-bind:color="app.secondaryColor"
+                    <div>
+                        <v-text-field hide-details outlined label="Type a message" v-model="newMessage" v-bind:color="app.secondaryColor"
                             @keyup.enter="sendMessage({user: app.username, text: newMessage})">
                         </v-text-field>
                         Current users:<span v-for="user in app.roomData.users"> {{user}}<span v-if="!isLast(user, app.roomData.users)">,</span></span>
-                    </v-card-text>
+                    </div>
                     <v-card-actions>
                         <v-btn block @click="sendMessage({user: app.username, text: newMessage})" v-bind:color="app.secondaryColor">send</v-btn>
                     </v-card-actions>
                 </v-card>`
 }
 
-
 //MAIN APP
 var app = new Vue({
     el: "#app",
+    vuetify: new Vuetify({}),
     components: {
         'messaging': Messaging,
         'privateroomcategory': PrivateRoomCategory,
@@ -184,7 +186,6 @@ var app = new Vue({
         games: [
             "pictionary",
             "tictactoe",
-            "go"
         ],
         privateMessageRooms: {
         },

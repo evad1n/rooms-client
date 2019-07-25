@@ -14,25 +14,25 @@
 </head>
 
 <div id="app" v-cloak>
-    <v-app>
+    <v-app light>
         <v-content>
 
             <!-- TOOLBAR -->
-            <v-toolbar fixed app v-bind:color="primaryColor" v-if="page != 'login'">
+            <v-app-bar v-bind:color="primaryColor" v-if="page != 'login'">
                 <v-toolbar-title id="title">ROOMS</v-toolbar-title>
                 <v-toolbar-title>{{app.username}}</v-toolbar-title>
                 <v-spacer></v-spacer>
                 <v-toolbar-items class="display-1">
-                    <v-btn flat v-on:click="switchRoom('home')">HOME</v-btn>
+                    <v-btn text v-on:click="switchRoom('home')">HOME</v-btn>
                     <div class="toolbar-divider"></div>
                     <PrivateRoomCategory v-bind:title="'Messaging'" v-bind:type="'messages'"></PrivateRoomCategory>
                     <div class="toolbar-divider"></div>
-                    <v-btn flat v-on:click="switchRoom('singularity')">Singularity</v-btn>
+                    <v-btn text v-on:click="switchRoom('singularity')">Singularity</v-btn>
                     <div class="toolbar-divider"></div>
                     <PrivateRoomCategory v-bind:title="'Game Rooms'" v-bind:type="'games'"></PrivateRoomCategory>
                     <div class="toolbar-divider"></div>
                 </v-toolbar-items>
-            </v-toolbar>
+            </v-app-bar>
 
             <!-- WELCOME TEXT -->
             <v-card-title class="display-1 justify-center px-0 pb-0" v-if="page != 'login' && welcome">Welcome
@@ -48,7 +48,7 @@
                         <v-card id="login" elevation="18" v-bind:color="primaryColor">
                             <v-card-title class="display-1 justify-center">Enter a Username</v-card-title>
                             <v-card-text>
-                                <v-text-field label="name" v-model="testUsername" outline v-bind:color="secondaryColor"
+                                <v-text-field hide-details outlined label="name" v-model="testUsername" v-bind:color="secondaryColor"
                                     @keyup.enter="checkUsername()">
                                 </v-text-field>
                             </v-card-text>
@@ -66,7 +66,7 @@
             <!-- HOME -->
             <v-container v-if="page == 'home'" grid-list-xl fluid>
                 <v-layout>
-                    <v-flex xs3 pt-0>
+                    <v-flex xs3>
                         <v-card elevation="18" v-bind:color="primaryColor" class="list">
                             <v-card-title class="subheading justify-center">YOUR INVITES</v-card-title>
                             <div v-for="invite in invites" class="text-xs-center" v-bind:color="tertiaryColor">
@@ -81,7 +81,7 @@
                         <v-card-title class="display-2 justify-center">HOME</v-card-title>
                         <Messaging v-bind:route="'home'" v-bind:key="1"></Messaging>
                     </v-flex>
-                    <v-flex xs3 pt-0>
+                    <v-flex xs3>
                         <v-card elevation="18" v-bind:color="primaryColor" class="list">
                             <v-card-title class="subheading justify-center">Create Game Room</v-card-title>
                             <div v-for="game in games" class="text-xs-center" v-bind:color="tertiaryColor">
@@ -151,7 +151,7 @@
                                 <v-flex xs4>
                                     <v-layout column>
                                         <v-flex xs2>
-                                            <p class="text-xs-center">{{Math.floor(pictionary.seconds)}}</p>
+                                            <p v-if="app.roomData.timer" class="text-xs-center">Time Left: {{Math.floor(app.roomData.timer.seconds)}}</p>
                                         </v-flex>
                                         <v-flex xs4>
                                             <h4 class="text-xs-center" py-0>SCORE</h4>
@@ -184,7 +184,7 @@
                                                 @click="pictionary.start()" v-bind:color="secondaryColor" block>
                                                 Start</v-btn>
                                             <v-btn
-                                                v-if="app.roomData.started && app.roomData.turn.user == app.username && app.roomData.winner == 'none' && pictionary.seconds == 0"
+                                                v-if="app.roomData.started && app.roomData.turn.user == app.username && app.roomData.winner == 'none' && !app.roomData.drawing"
                                                 @click="pictionary.beginDrawing()" v-bind:color="secondaryColor" block>
                                                 Begin Drawing</v-btn>
                                             <v-btn
@@ -296,9 +296,6 @@
                         </v-card>
                     </v-flex>
 
-                    <!-- GO -->
-                    
-
                     <!-- SIDEBAR -->
                     <v-flex xs4 pt-0>
                         <v-card v-bind:color="secondaryColor">
@@ -313,14 +310,13 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/vue"></script>
-<script src="https://cdn.jsdelivr.net/npm/vuetify/dist/vuetify.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vuetify/dist/vuetify.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/vue-chat-scroll/dist/vue-chat-scroll.min.js"></script>
 
 <script src="script.js"></script>
 <script src="games/pictionary.js"></script>
 <script src="games/tictactoe.js"></script>
-<script src="games/go.js"></script>
-<script src="games/singularity/three.js"></script>
+<!-- <script src="games/singularity/three.js"></script>
 <script src="games/singularity/extensions/OrbitControls.js"></script>
-<script src="games/singularity/singularity.js"></script>
+<script src="games/singularity/singularity.js"></script> -->
 </html>

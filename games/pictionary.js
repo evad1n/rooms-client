@@ -1,5 +1,5 @@
 //PICTIONARY
-const PICTIONARY_INTERVAL = 500
+const PICTIONARY_INTERVAL = 50
 
 var pictionary = new Vue({
     data: {
@@ -12,40 +12,17 @@ var pictionary = new Vue({
         isDrawing: false,
         startPos: {},
         endPos: {},
+        startLine: {},
+        endLine: {},
         timer: null,
-        seconds: 0,
-        lines: [],
     },
     methods: {
         beginDrawing: function () {
-            this.canvas = app.$refs.canvas[0];
-            this.context = this.canvas.getContext("2d");
-            this.canvas.addEventListener('mousedown', this.mousedown);
-            this.canvas.addEventListener('mousemove', this.mousemove);
-            document.addEventListener('mouseup', this.mouseup);
-
+            // start turn
             app.roomData.drawing = true
+            app.roomData.timer.lastTime = new Date()
 
-            //Start timer
-            this.timer = setInterval(() => {
-                pictionary.seconds += 0.5
-
-                pictionary.updateDrawing()
-
-                // END TURN
-                if (pictionary.seconds > 30) {
-                    pictionary.endDrawing()
-                    pictionary.seconds = 0
-                }
-            }, PICTIONARY_INTERVAL);
             this.sendGameInfo()
-        },
-        endDrawing: function () {
-            app.roomData.drawing = false
-            this.canvas.removeEventListener('mousedown', this.mousedown);
-            this.canvas.removeEventListener('mousemove', this.mousemove);
-            document.removeEventListener('mouseup', this.mouseup);
-            clearInterval(this.timer)
         },
         mousedown: function (e) {
             if (app.roomData.turn.user == app.username) {
@@ -55,6 +32,7 @@ var pictionary = new Vue({
 
                 this.isDrawing = true;
                 this.startPos = { x: x, y: y }
+                this.startLine = { x: x, y: y }
             }
         },
         mousemove: function (e) {
@@ -73,6 +51,7 @@ var pictionary = new Vue({
                     this.context.stroke();
 
                     this.startPos = { x: x, y: y }
+                    this.endLine = { x: x, y: y }
                 }
             }
         },
@@ -92,6 +71,17 @@ var pictionary = new Vue({
                     user: app.username
                 })
             })
+
+            // link drawing tools
+            this.canvas = app.$refs.canvas[0];
+            this.context = this.canvas.getContext("2d");
+            this.canvas.addEventListener('mousedown', this.mousedown);
+            this.canvas.addEventListener('mousemove', this.mousemove);
+            document.addEventListener('mouseup', this.mouseup);
+
+            this.timer = setInterval(() => {
+                pictionary.updateDrawing()
+            }, PICTIONARY_INTERVAL);
         },
         start: function () {
             //Start game
@@ -114,10 +104,9 @@ var pictionary = new Vue({
             app.roomData.turn.turn = app.roomData.first
 
             this.sendGameInfo()
+            clearInterval(this.timer)
         },
         sendGameInfo: function () {
-            //app.roomData.lines = pictionary.lines
-
             fetch(`${url}/${app.page}/game`, {
                 method: "POST",
                 headers: {
@@ -134,32 +123,25 @@ var pictionary = new Vue({
 
                 // If this user is drawing
                 if (app.roomData.turn.user == app.username) {
-                    if (true) {
-                        var endPos = { x: pictionary.startPos.x, y: pictionary.startPos.y }
-                        // send line to to the server
-                        app.roomData.lines.push({ start: pictionary.startPos, end: endPos, color: pictionary.marker_color })
-                        // send data
-                        pictionary.sendGameInfo()
-                    }
+                    // send line to to the server
+                    app.roomData.lines.push({ start: pictionary.startLine, end: pictionary.endLine, color: pictionary.marker_color })
+                    // send data
+                    pictionary.sendGameInfo()
+                    pictionary.startLine = { x: pictionary.endLine.x, y: pictionary.endLine.y }
                 }
                 else {
-                    var diff = app.roomData.lines.length - pictionary.lines.length
-                    // if there are new lines
-                    if (diff > 0) {
-                        // add to drawing
-                        for (let i = 0; i < diff; i++) {
-                            var line = app.roomData.lines[pictionary.lines.length + i]
-                            pictionary.lines.push(line)
+                    // update drawing
+                    for (let i = 0; i < app.roomData.lines.length; i++) {
+                        var line = app.roomData.lines[i]
 
-                            // draw line 
-                            this.context.beginPath();
-                            this.context.moveTo(line.start.x, line.start.y);
-                            this.context.lineTo(line.end.x, line.end.y);
-                            this.context.lineWidth = 5;
-                            this.context.lineCap = 'round';
-                            this.context.strokeStyle = line.color;
-                            this.context.stroke();
-                        }
+                        // draw line 
+                        this.context.beginPath();
+                        this.context.moveTo(line.start.x, line.start.y);
+                        this.context.lineTo(line.end.x, line.end.y);
+                        this.context.lineWidth = 5;
+                        this.context.lineCap = 'round';
+                        this.context.strokeStyle = line.color;
+                        this.context.stroke();
                     }
                 }
             }
