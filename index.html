@@ -28,7 +28,7 @@
                 <v-toolbar-items class="display-1">
                     <v-btn text v-on:click="switchRoom('home')">HOME</v-btn>
                     <div class="toolbar-divider"></div>
-                    <v-btn text v-on:click="switchRoom('home')">Singularity</v-btn>
+                    <v-btn text v-on:click="switchRoom('singularity')">Singularity</v-btn>
                     <div class="toolbar-divider"></div>
                     <PrivateRoomCategory v-bind:title="'Messaging'" v-bind:type="'messages'"></PrivateRoomCategory>
                     <div class="toolbar-divider"></div>
@@ -130,7 +130,7 @@
                                 <!-- BOARD -->
                                 <v-flex xs8>
                                     <v-layout>
-                                        <v-flex xs1 pl-4 pt-4>
+                                        <v-flex xs1 class="pl-8 pt-8">
                                             <div v-bind:style="{ backgroundColor: pictionary.marker_color}"
                                                 style="width: 30px; height: 30px"></div>
                                         </v-flex>
@@ -149,11 +149,11 @@
                                 <!-- STATISTICS -->
                                 <v-flex xs4>
                                     <v-layout column>
-                                        <v-flex xs2>
-                                            <p v-if="app.roomData.timer" class="text-center">Time Left:
-                                                {{Math.floor(app.roomData.timer.seconds)}}</p>
+                                        <v-flex xs2 class="py-0">
+                                            <p class="text-center">Time Left:
+                                                {{pictionary.secondsLeft}}</p>
                                         </v-flex>
-                                        <v-flex xs4>
+                                        <v-flex xs4 class="py-0">
                                             <h4 class="text-center" py-0>SCORE</h4>
                                             <v-divider></v-divider>
                                             <p class="text-center scores">
@@ -161,7 +161,15 @@
                                                     {{player.score}} &emsp;</span>
                                             </p>
                                         </v-flex>
-                                        <v-flex xs2>
+                                        <v-flex xs2 class="py-0" style="height: 45px">
+                                            <p v-if="!app.roomData.started">
+                                                Ready players:
+                                                <span v-for="player in app.roomData.players">
+                                                    {{player.name}}
+                                                    <span v-if="!isLast(player, app.roomData.players)">,</span>
+                                                </span>
+                                            </p>
+
                                             <p class="text-center"
                                                 v-if="app.roomData.started && app.roomData.turn.user == app.username && app.roomData.winner == 'none'">
                                                 It
@@ -174,7 +182,7 @@
                                                 is
                                                 {{app.roomData.turn.user}}'s turn</p>
                                         </v-flex>
-                                        <v-flex xs4>
+                                        <v-flex xs4 class="py-0">
                                             <v-btn v-if="!app.roomData.players.some(e => e.name === app.username)"
                                                 @click="pictionary.readyUp()" v-bind:color="secondaryColor" block>
                                                 Ready
@@ -249,9 +257,7 @@
                                             <p pa-0>
                                                 <p v-if="!app.roomData.started">
                                                     Ready players:
-                                                    <span v-for="player in app.roomData.players">
-                                                        {{player.name}}
-                                                        <span v-if="!isLast(player, app.roomData.players)">,</span>
+                                                    <span v-for="player in app.roomData.players">{{player.name}}<span v-if="!isLast(player, app.roomData.players)">,</span>
                                                     </span>
                                                 </p>
 

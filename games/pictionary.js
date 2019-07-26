@@ -10,22 +10,27 @@ var pictionary = new Vue({
         canvas: null,
         context: null,
         isDrawing: false,
-        startPos: {},
-        endPos: {},
-        startLine: {},
-        endLine: {},
+        startPos: null,
+        endPos: null,
+        startLine: null,
+        endLine: null,
         timer: null,
     },
     methods: {
         beginDrawing: function () {
             // start turn
             app.roomData.drawing = true
-            app.roomData.timer.lastTime = new Date()
+            app.roomData.startTime = new Date()
+            this.startLine = null
+            this.endLine = null
+            this.startPos = null
+            this.endPos = null
+            console.log("begin")
 
             this.sendGameInfo()
         },
         mousedown: function (e) {
-            if (app.roomData.turn.user == app.username) {
+            if (app.roomData.turn.user == app.username && app.roomData.drawing) {
                 var rect = this.canvas.getBoundingClientRect();
                 var x = e.clientX - rect.left;
                 var y = e.clientY - rect.top;
@@ -36,7 +41,7 @@ var pictionary = new Vue({
             }
         },
         mousemove: function (e) {
-            if (app.roomData.turn.user == app.username) {
+            if (app.roomData.turn.user == app.username && app.roomData.drawing) {
                 var rect = this.canvas.getBoundingClientRect();
                 var x = e.clientX - rect.left;
                 var y = e.clientY - rect.top;
@@ -58,6 +63,7 @@ var pictionary = new Vue({
         mouseup: function (e) {
             if (app.roomData.turn.user == app.username) {
                 this.isDrawing = false;
+                this.endLine = null
             }
         },
         readyUp: function () {
@@ -93,7 +99,7 @@ var pictionary = new Vue({
             })
         },
         reset: function () {
-            app.roomData.canvas = null
+            this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
             app.roomData.winner = "none"
             app.roomData.started = false
 
@@ -123,11 +129,13 @@ var pictionary = new Vue({
 
                 // If this user is drawing
                 if (app.roomData.turn.user == app.username) {
-                    // send line to to the server
-                    app.roomData.lines.push({ start: pictionary.startLine, end: pictionary.endLine, color: pictionary.marker_color })
-                    // send data
-                    pictionary.sendGameInfo()
-                    pictionary.startLine = { x: pictionary.endLine.x, y: pictionary.endLine.y }
+                    if (pictionary.isDrawing && pictionary.endLine == null) {
+                        // send line to to the server
+                        app.roomData.lines.push({ start: pictionary.startLine, end: pictionary.endLine, color: pictionary.marker_color })
+                        // send data
+                        pictionary.sendGameInfo()
+                        pictionary.startLine = { x: pictionary.endLine.x, y: pictionary.endLine.y }
+                    }
                 }
                 else {
                     // update drawing
@@ -144,7 +152,18 @@ var pictionary = new Vue({
                         this.context.stroke();
                     }
                 }
+            } else {
+                this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
             }
+        }
+    },
+    computed: {
+        secondsLeft: function() {
+            if(app.roomData.drawing) {
+                var ms = new Date().getTime() - new Date(app.roomData.startTime).getTime()
+                return 5 - Math.max(Math.floor(ms / 1000), 0)
+            }
+            return 5
         }
     },
 })
