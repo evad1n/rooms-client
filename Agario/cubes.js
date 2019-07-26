@@ -255,18 +255,18 @@ var updatePlayer = function () {
     pRotation.z = camera.rotation.z;
 
     pMesh.rotation.set(pRotation.x, pRotation.y, pRotation.z);
-    pRing.rotation.z += 0.001;
+    pRing.rotateZ(0.001);
     pRing.scale.set(pMesh.scale.x * 7, pMesh.scale.x * 7, pMesh.scale.x * 7);
 
     //GROW
-    pAmount += pSavedAmount / 30;
-    pSavedAmount -= pSavedAmount / 30;
+    pAmount += pSavedAmount / 15;
+    pSavedAmount -= pSavedAmount / 15;
     pMesh.scale.set(Math.sqrt(pAmount), Math.sqrt(pAmount), Math.sqrt(pAmount));
 
     controls.minDistance = Math.sqrt(pAmount) * 5;
     controls.maxDistance = Math.sqrt(pAmount) * 5;
 
-    pX -= pX / 30;
+    pX -= pX / 15;
     pMesh.translateZ(pX / pInterval);
     pPosition = pMesh.position;
     pRing.position.set(pPosition.x, pPosition.y, pPosition.z);
@@ -275,7 +275,9 @@ var updatePlayer = function () {
         devour(player);
     })
     asteroids.forEach(function (asteroid) {
-        devour(asteroid);
+        asteroid.asteroids.forEach(function (rock) {
+            devour(rock);
+        })
     })
 }
 
