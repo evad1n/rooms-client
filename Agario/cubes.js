@@ -40,6 +40,7 @@ var players = [
         ringrotation: { x: -3, y: 4, z: 0 }
     },
 ];
+var locations = [];
 
 var asteroidAmount = 5000;
 var asteroids = [];
