@@ -182,6 +182,7 @@ var createStar = function () {
 var createScene = function () {
     createSun();
     createAmbientLight();
+    createAsteroids();
 }
 
 
