@@ -1,5 +1,5 @@
-const url = 'https://server-rooms.herokuapp.com'
-// const url = 'http://localhost:3000'
+// const url = 'https://server-rooms.herokuapp.com'
+const url = 'http://localhost:3000'
 
 const UPDATE_INTERVAL = 200
 
@@ -256,8 +256,9 @@ var app = new Vue({
                 fetch(`${url}/users`).then(function (res) {
                     res.json().then(function (data) {
                         app.badName = false
-                        for (let i = 0; i < data.users.length; i++) {
-                            if (app.testUsername == data.users[i]) {
+                        var users = Object.keys(data.users)
+                        for (let i = 0; i < users.length; i++) {
+                            if (app.testUsername == users[i]) {
                                 app.badName = true
                             }
                         }
