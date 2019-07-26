@@ -82,6 +82,7 @@ var Messaging = {
                 },
                 body: JSON.stringify({ room: `${app.page}`, from: app.username })
             })
+            this.addSearchQuery = ''
         },
         remove: function (name) {
             // remove user from room
@@ -92,6 +93,7 @@ var Messaging = {
                 },
                 body: JSON.stringify({ user: name })
             })
+            this.removeSearchQuery = ''
         },
         canInvite: function () {
             if (app.roomData.maxPlayers && app.roomData.users.length == app.roomData.maxPlayers) {

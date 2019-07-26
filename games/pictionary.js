@@ -10,8 +10,6 @@ var pictionary = new Vue({
         canvas: null,
         context: null,
         isDrawing: false,
-        startPos: null,
-        endPos: null,
         startLine: null,
         endLine: null,
         timer: null,
@@ -19,15 +17,21 @@ var pictionary = new Vue({
     methods: {
         beginDrawing: function () {
             // start turn
-            app.roomData.drawing = true
-            app.roomData.startTime = new Date()
             this.startLine = null
             this.endLine = null
             this.startPos = null
             this.endPos = null
-            console.log("begin")
 
-            this.sendGameInfo()
+            // start round timer
+            fetch(`${url}/${app.page}/game/turn`, {
+                method: "POST",
+                headers: {
+                    "Content-type": "application/json"
+                },
+                body: JSON.stringify({
+                    data: app.roomData
+                })
+            })
         },
         mousedown: function (e) {
             if (app.roomData.turn.user == app.username && app.roomData.drawing) {
@@ -36,8 +40,8 @@ var pictionary = new Vue({
                 var y = e.clientY - rect.top;
 
                 this.isDrawing = true;
-                this.startPos = { x: x, y: y }
                 this.startLine = { x: x, y: y }
+                this.endLine = { x: x, y: y }
             }
         },
         mousemove: function (e) {
@@ -47,15 +51,6 @@ var pictionary = new Vue({
                 var y = e.clientY - rect.top;
 
                 if (this.isDrawing) {
-                    this.context.beginPath();
-                    this.context.moveTo(this.startPos.x, this.startPos.y);
-                    this.context.lineTo(x, y);
-                    this.context.lineWidth = 5;
-                    this.context.lineCap = 'round';
-                    this.context.strokeStyle = this.marker_color;
-                    this.context.stroke();
-
-                    this.startPos = { x: x, y: y }
                     this.endLine = { x: x, y: y }
                 }
             }
@@ -63,6 +58,7 @@ var pictionary = new Vue({
         mouseup: function (e) {
             if (app.roomData.turn.user == app.username) {
                 this.isDrawing = false;
+                this.startLine = null
                 this.endLine = null
             }
         },
@@ -119,7 +115,7 @@ var pictionary = new Vue({
                     "Content-type": "application/json"
                 },
                 body: JSON.stringify({
-                    data: app.roomData
+                    lines: app.roomData.lines
                 })
             })
         },
@@ -129,9 +125,19 @@ var pictionary = new Vue({
 
                 // If this user is drawing
                 if (app.roomData.turn.user == app.username) {
-                    if (pictionary.isDrawing && pictionary.endLine == null) {
+                    if (pictionary.isDrawing && pictionary.startLine != null && pictionary.endLine != null) {
                         // send line to to the server
                         app.roomData.lines.push({ start: pictionary.startLine, end: pictionary.endLine, color: pictionary.marker_color })
+
+                        //draw line
+                        this.context.beginPath();
+                        this.context.moveTo(pictionary.startLine.x, pictionary.startLine.y);
+                        this.context.lineTo(pictionary.endLine.x, pictionary.endLine.y);
+                        this.context.lineWidth = 5;
+                        this.context.lineCap = 'round';
+                        this.context.strokeStyle = pictionary.marker_color;
+                        this.context.stroke();
+
                         // send data
                         pictionary.sendGameInfo()
                         pictionary.startLine = { x: pictionary.endLine.x, y: pictionary.endLine.y }
