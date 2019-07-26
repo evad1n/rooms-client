@@ -1,5 +1,3 @@
-const url = 'http://localhost:3000';
-
 var pUsername = "Antoine";
 var pPosition = { x: 0, y: 0, z: 0 };
 var pRotation = { x: 0, y: 0, z: 0 };
@@ -11,13 +9,13 @@ var pY = 0;
 var pZ = 0;
 var pMesh = null;
 var pRing = null;
-var pRingColor = 0xFFCC00;
+var pRingColor = 0x000000;
 var pInterval = 30;
 
 var players = [
     {
         username: "James",
-        position: { x: 55, y: 567, z: -320 },
+        position: { x: 5, y: 0, z: -32 },
         ringcolor: 0xFF0000,
         amount: 47,
         alive: true,
@@ -25,22 +23,21 @@ var players = [
     },
     {
         username: "Japmes",
-        position: { x: -199, y: 60, z: 70 },
+        position: { x: -19, y: 0, z: 0 },
         ringcolor: 0x00FF00,
         amount: 16,
         alive: true,
-        ringrotation: { x: 267, y: -61, z: 206 }
+        ringrotation: { x: 2, y: -1, z: 0 }
     },
     {
         username: "Jamppes",
-        position: { x: 100, y: 10, z: 16 },
+        position: { x: 1, y: 0, z: 16 },
         ringcolor: 0xFF00FF,
         amount: 9,
         alive: true,
         ringrotation: { x: -3, y: 4, z: 0 }
     },
 ];
-var locations = [];
 
 var asteroidAmount = 5000;
 var asteroids = [];
@@ -49,9 +46,7 @@ var starAmount = 100;
 var stars = [];
 
 var scene = new THREE.Scene();
-var spaceTextures = ['images/outerspace_left.png', 'images/outerspace_right.png', 'images/outerspace_up.png', 'images/outerspace_down.png', 'images/outerspace_front.png', 'images/outerspace_back.png'];
-//var spaceTextures = ['images/space_1_left.png', 'images/space_1_right.png', 'images/space_1_up.png', 'images/space_1_down.png', 'images/space_1_front.png', 'images/space_1_back.png'];
-scene.background = new THREE.CubeTextureLoader().load(spaceTextures);
+scene.background = new THREE.CubeTextureLoader().load(['images/outerspace_left.png', 'images/outerspace_right.png', 'images/outerspace_up.png', 'images/outerspace_down.png', 'images/outerspace_front.png', 'images/outerspace_back.png']);
 
 var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 3000);
 var direction = new THREE.Vector3();
@@ -64,7 +59,7 @@ document.body.appendChild(renderer.domElement);
 var controls = new THREE.OrbitControls(camera, renderer.domElement);
 controls.enablePan = false;
 
-javascript: (function () { var script = document.createElement('script'); script.onload = function () { var stats = new Stats(); document.body.appendChild(stats.dom); requestAnimationFrame(function loop() { stats.update(); requestAnimationFrame(loop) }); }; script.src = '//mrdoob.github.io/stats.js/build/stats.min.js'; document.head.appendChild(script); })()
+
 
 //EVENT LISTENERS
 window.addEventListener('resize', function () {
@@ -131,7 +126,7 @@ var createAmbientLight = function () {
 }
 
 var createAsteroids = function () {
-    var asteroids = [];
+    var locations = [];
 
     for (var l = 0; l < 50; l++) {
         var location = {
@@ -164,7 +159,7 @@ var createAsteroids = function () {
     }
 }
 
-/*var createMoons = function (planet) {
+var createMoons = function (planet) {
     var amount = (planet.amount / 4) / createMoons.length;
     var geometry = new THREE.SphereGeometry(1, 32, 32)
     var material = new THREE.MeshPhongMaterial({ color: randomColor() })
@@ -178,7 +173,7 @@ var createStar = function () {
     var mesh = new THREE.Mesh(geometry, material);
     mesh.position.set(15, 20, 4);
     scene.add(mesh);
-}*/
+}
 
 var createScene = function () {
     createSun();
@@ -203,7 +198,6 @@ mtlLoader.load('models/raptor.mtl', function (materials) {
 //UPDATE
 var createPlayer = function () {
     var geometry = new THREE.SphereGeometry(1, 32, 32);
-    var blackhole = new THREE.CubeTextureLoader().load(spaceTextures);
     scene.background.mapping = THREE.CubeRefractionMapping;
     var material = new THREE.MeshStandardMaterial({
         roughness: 0,
@@ -235,8 +229,6 @@ var createPlayer = function () {
 }
 
 createPlayer();
-pMesh.scale.set(Math.sqrt(pAmount), Math.sqrt(pAmount), Math.sqrt(pAmount));
-camera.position.set(pPosition.x, pPosition.y + Math.sqrt(pAmount) * 2, pPosition.z);
 
 var devour = function (other) {
     var dx = pPosition.x - other.position.x;
@@ -263,18 +255,18 @@ var updatePlayer = function () {
     pRotation.z = camera.rotation.z;
 
     pMesh.rotation.set(pRotation.x, pRotation.y, pRotation.z);
-    pRing.rotateZ(0.001);
+    pRing.rotation.z += 0.001;
     pRing.scale.set(pMesh.scale.x * 7, pMesh.scale.x * 7, pMesh.scale.x * 7);
 
     //GROW
-    pAmount += pSavedAmount / 15;
-    pSavedAmount -= pSavedAmount / 15;
+    pAmount += pSavedAmount / 30;
+    pSavedAmount -= pSavedAmount / 30;
     pMesh.scale.set(Math.sqrt(pAmount), Math.sqrt(pAmount), Math.sqrt(pAmount));
 
     controls.minDistance = Math.sqrt(pAmount) * 5;
     controls.maxDistance = Math.sqrt(pAmount) * 5;
 
-    pX -= pX / 15;
+    pX -= pX / 30;
     pMesh.translateZ(pX / pInterval);
     pPosition = pMesh.position;
     pRing.position.set(pPosition.x, pPosition.y, pPosition.z);
@@ -285,71 +277,83 @@ var updatePlayer = function () {
     asteroids.forEach(function (asteroid) {
         devour(asteroid);
     })
+}
 
-
+var clearPlayers = function () {
+    players.forEach(function (player) {
+        scene.remove(player.mesh);
+        player.mesh.geometry.dispose();
+        player.mesh.material.dispose();
+    })
 }
 
 var updatePlayers = function () {
     players.forEach(function (player) {
         //Mesh Creation
         if (player.alive) {
-            if (typeof player.mesh === 'undefined') {
-                var geometry = new THREE.SphereGeometry(1, 32, 32);
-                var material = new THREE.MeshStandardMaterial({ roughness: 0, metalness: 1, refractionRatio: 0.8, envMap: scene.background });
-                player.mesh = new THREE.Mesh(geometry, material);
-                player.mesh.position.set(player.position.x, player.position.y, player.position.z);
-                player.mesh.scale.set(Math.sqrt(player.amount), Math.sqrt(player.amount), Math.sqrt(player.amount));
-                scene.add(player.mesh);
+            var geometry = new THREE.SphereGeometry(1, 32, 32);
+            var material = new THREE.MeshStandardMaterial({ roughness: 0, metalness: 1, envMap: scene.background });
+            player.mesh = new THREE.Mesh(geometry, material);
+            player.mesh.position.set(player.position.x, player.position.y, player.position.z);
+            player.mesh.scale.set(Math.sqrt(player.amount), Math.sqrt(player.amount), Math.sqrt(player.amount));
+            scene.add(player.mesh);
 
-                //var material = new THREE.MeshBasicMaterial({ color: player.ringcolor, map: new THREE.TextureLoader().load('images/ring.png'), side: THREE.DoubleSide, alphaTest: 0, transparent: true, opacity: 1, blending: THREE.AdditiveBlending });
-                //var geometry = new THREE.PlaneGeometry(1, 1, 1);
-                //player.ring = new THREE.Mesh(geometry, material);
-                //player.ring.position.set(player.position.x,player.position.y,player.position.z);
-                //player.ringrotation.z += 0.001;
-                //player.ring.rotation.set(player.ringrotation.x,player.ringrotation.y,player.ringrotation.z);
-                //player.ring.scale.set(Math.sqrt(player.amount) * 7, Math.sqrt(player.amount) * 7, Math.sqrt(player.amount) * 7);
-                //scene.add(player.ring);
-            } else {
-                player.mesh.position.set(player.position.x, player.position.y, player.position.z);
-                player.mesh.scale.set(Math.sqrt(player.amount), Math.sqrt(player.amount), Math.sqrt(player.amount));
-            }
-        } else {
-            scene.remove(player.mesh);
-            player.mesh.geometry.dispose();
-            player.mesh.material.dispose();
+            //var material = new THREE.MeshBasicMaterial({ color: player.ringcolor, map: new THREE.TextureLoader().load('images/ring.png'), side: THREE.DoubleSide, alphaTest: 0, transparent: true, opacity: 1, blending: THREE.AdditiveBlending });
+            //var geometry = new THREE.PlaneGeometry(1, 1, 1);
+            //player.ring = new THREE.Mesh(geometry, material);
+            //player.ring.position.set(player.position.x,player.position.y,player.position.z);
+            //player.ringrotation.z += 0.001;
+            //player.ring.rotation.set(player.ringrotation.x,player.ringrotation.y,player.ringrotation.z);
+            //player.ring.scale.set(Math.sqrt(player.amount) * 7, Math.sqrt(player.amount) * 7, Math.sqrt(player.amount) * 7);
+            //scene.add(player.ring);
         }
     })
 }
 
-
+pMesh.scale.set(Math.sqrt(pAmount), Math.sqrt(pAmount), Math.sqrt(pAmount));
+camera.position.set(pPosition.x, pPosition.y + Math.sqrt(pAmount) * 2, pPosition.z);
+updatePlayers();
 
 var updateAsteroids = function () {
     asteroids.forEach(function (asteroid) {
-        if (asteroid.alive) {
-            if (typeof asteroid.mesh === 'undefined') {
-                var geometry = new THREE.BoxGeometry(amount, amount, amount);
-                var material = new THREE.MeshLambertMaterial({ color: 0xAA5522 });
-                mesh.position.set(asteroid.position.x, asteroid.position.y, asteroid.position.z);
-                mesh.scale.set(asteroid.amount,asteroid.amount,asteroid.amount);
-                var mesh = new THREE.Mesh(geometry, material);
-            } else {
-                asteroid.mesh.rotation.x += asteroid.velocity * 0.05;
-                asteroid.mesh.rotation.y += asteroid.velocity * 0.05;
-                asteroid.mesh.rotation.z += asteroid.velocity * 0.05;
-                mesh.position.set(asteroid.position.x, asteroid.position.y, asteroid.position.z);
-            }
-        } else {
+        if (!asteroid.alive) {
             scene.remove(asteroid.mesh);
             asteroid.mesh.geometry.dispose();
             asteroid.mesh.material.dispose();
         }
+        asteroid.mesh.rotation.x += asteroid.velocity * 0.05;
+        asteroid.mesh.rotation.y += asteroid.velocity * 0.05;
+        asteroid.mesh.rotation.z += asteroid.velocity * 0.05;
     })
+}
+
+var updateGame = function () {
+    updatePlayer();
+    clearPlayers();
+    updatePlayers();
+    updateAsteroids();
+}
+
+var render = function () {
+    updateGame();
+    requestAnimationFrame(render);
+    renderer.render(scene, camera);
+    controls.target = pMesh.position;
+    controls.update();
 }
 
 
 //SERVER COMMUNICATION
-/*var sendPlayer = function () {
-    fetch(`${url}/singularity/update`, {
+var getPlayers = function () {
+    fetch(`${url}/Agario/singularities`).then(function (res) {
+        res.json().then(function (data) {
+            players = data.players
+        });
+    });
+}
+
+var sendPlayer = function () {
+    fetch(`${url}/Agario/singularities`, {
         method: "POST",
         headers: {
             "Content-type": "application/json"
@@ -357,29 +361,125 @@ var updateAsteroids = function () {
         body: JSON.stringify({
             username: pUsername,
             position: pPosition,
-            ringcolor: pRingColor,
+            color: pColor,
             amount: pAmount,
             alive: pAlive,
             ringrotation: pRing.rotation
         })
     })
-}*/
-
-var updateGame = function () {
-    updatePlayer();
-    //sendPlayer();
-    updatePlayers();
-    updateAsteroids();
-    controls.target = pMesh.position;
-    controls.update();
-    //sendPlayer();
 }
-
-var render = function () {
-    requestAnimationFrame(render);
-    renderer.render(scene, camera);
-}
-
-var gameLoop = setInterval(() => { updateGame() }, 100);
 
 render();
+
+rooms["singularity"] = {
+    users: [],
+    locations: [],
+    asteroids: [],
+    systems: [],
+    messageHistory: [],
+}
+
+server.post("/:room/singularity/load", function (req, res) {
+
+});
+
+//GAME CREATION FUNCTIONS
+var generateLocations = function () {
+    for (var l = 0; l < 50; l++) {
+        var type = Math.floor(Math.random() * 10);
+        var locationPosition = {
+            x: (Math.random() * 5000) - (Math.random() * 5000),
+            y: (Math.random() * 5000) - (Math.random() * 5000),
+            z: (Math.random() * 5000) - (Math.random() * 5000),
+            a: Math.floor((Math.random() * 10))
+        };
+
+        if (type < 9) {
+            var location = {
+                name: "",
+                type: "asteroid field",
+                position: locationPosition,
+                taken: false
+            };
+            rooms.locations.push(location);
+        } else if (type == 9) {
+            var location = {
+                name: "",
+                type: "system",
+                position: locationPosition,
+                taken: false
+            };
+            rooms.locations.push(location);
+        }
+    }
+}
+
+var generateAsteroids = function () {
+    for (var i = 0; i < asteroidAmount; i++) {
+        var l_num = Math.floor(Math.random() * 50);
+        var amount = Math.sqrt(locations[l_num].a);
+
+        var position = {
+            x: locations[l_num].x + ((Math.random() * 300) - (Math.random() * 300)),
+            y: locations[l_num].y + ((Math.random() * 300) - (Math.random() * 300)),
+            z: locations[l_num].z + ((Math.random() * 300) - (Math.random() * 300))
+        };
+
+        var asteroid = {
+            amount: Math.sqrt(amount),
+            position: position,
+            alive: true,
+            velocity: (Math.random() - Math.random())
+        };
+        asteroids.push(asteroid);
+    }
+}
+
+//HELPER FUNCTIONS
+var findDistance = function (player, other) {
+    var dx = player.position.x - other.position.x;
+    var dy = player.position.y - other.position.y;
+    var dz = player.position.z - other.position.z;
+    var distance = Math.sqrt(dx * dx + dy * dy + dz * dz);
+    return distance;
+}
+
+var findPlayersInRadius = function (player) {
+    var nearPlayers = [];
+    users.forEach(function (user) {
+        var userDistance = findDistance(player, user)
+        if (userDistance <= 2500) {
+            nearPlayers.push
+        }
+    })
+    return nearPlayers;
+}
+
+var findAsteroidsInRadius = function (player) {
+    var nearAsteroids = [];
+    asteroids.forEach(function (asteroid) {
+        var asteroidDistance = findDistance(player, asteroid)
+        if (asteroidDistance <= 2500) {
+            nearAsteroids.push
+        }
+    })
+    return nearAsteroids;
+}
+
+var findSystemsInRadius = function (player) {
+    var nearSystems = [];
+    systems.forEach(function (system) {
+        var systemDistance = findDistance(player, system)
+        if (systemDistance <= 2500) {
+            nearSystems.push
+        }
+    })
+    return nearSystems;
+}
+
+var findObjectsInRadius = function (player) {
+    var players = findPlayersInRadius(player);
+    var asteroids = findAsteroidsInRadius(player);
+    var stars = findStarsInRadius(player);
+    return { players: players, asteroids: asteroids, stars: stars }
+}
