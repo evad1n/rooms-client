@@ -17,7 +17,7 @@ var pInterval = 30;
 var players = [
     {
         username: "James",
-        position: { x: 5, y: 0, z: -32 },
+        position: { x: 55, y: 567, z: -320 },
         ringcolor: 0xFF0000,
         amount: 47,
         alive: true,
@@ -25,15 +25,15 @@ var players = [
     },
     {
         username: "Japmes",
-        position: { x: -19, y: 0, z: 0 },
+        position: { x: -199, y: 60, z: 70 },
         ringcolor: 0x00FF00,
         amount: 16,
         alive: true,
-        ringrotation: { x: 2, y: -1, z: 0 }
+        ringrotation: { x: 267, y: -61, z: 206 }
     },
     {
         username: "Jamppes",
-        position: { x: 1, y: 0, z: 16 },
+        position: { x: 100, y: 10, z: 16 },
         ringcolor: 0xFF00FF,
         amount: 9,
         alive: true,
