@@ -169,7 +169,7 @@ var Messaging = {
                     </v-flex>
                     <div v-chat-scroll="{always: false, smooth: true}" v-if="app.roomData.messageHistory.length > 0" class="messages-container">
                         <p v-for="(message, index) in app.roomData.messageHistory" :key="index">
-                            {{message.user}}: {{message.text}}
+                            <span class="message-name">{{message.user}}</span>: {{message.text}}
                         </p>
                     </div>
                     <v-card-text px-3>

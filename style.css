@@ -51,6 +51,10 @@
     margin: 0 auto;
 }
 
+.message-name {
+    font-weight: bolder;
+}
+
 .messages-container p{
     margin: 2px 5px 2px 8px;
 }
