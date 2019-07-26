@@ -129,7 +129,7 @@ var createAmbientLight = function () {
     scene.add(ambientlight);
 }
 
-/*var createAsteroids = function () {
+var createAsteroids = function () {
     var asteroids = [];
 
     for (var l = 0; l < 50; l++) {
@@ -161,7 +161,7 @@ var createAmbientLight = function () {
         asteroids.push(asteroid);
         scene.add(asteroid.mesh);
     }
-}*/
+}
 
 /*var createMoons = function (planet) {
     var amount = (planet.amount / 4) / createMoons.length;
