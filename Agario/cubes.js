@@ -211,7 +211,7 @@ var createPlayer = function () {
     scene.add(pMesh);
     var material = new THREE.MeshLambertMaterial({
         color: pRingColor,
-        map: new THREE.TextureLoader().load('games/singularity/images/ring.png'),
+        map: new THREE.TextureLoader().load('images/ring.png'),
         side: THREE.DoubleSide,
         alphaTest: 0,
         transparent: true,
