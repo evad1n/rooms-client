@@ -211,13 +211,13 @@ var createPlayer = function () {
     scene.add(pMesh);
     var material = new THREE.MeshLambertMaterial({
         color: pRingColor,
-        map: new THREE.TextureLoader().load('images/ring.png'),
+        map: new THREE.TextureLoader().load('games/singularity/images/ring.png'),
         side: THREE.DoubleSide,
         alphaTest: 0,
         transparent: true,
         blending: THREE.AdditiveBlending,
         emissive: pRingColor,
-        emissiveIntensity: 20
+        emissiveIntensity: 0.6
     });
     var geometry = new THREE.PlaneGeometry(1, 1, 16, 16);
     pRing = new THREE.Mesh(geometry, material);
