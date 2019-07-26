@@ -346,7 +346,7 @@ var updateAsteroids = function () {
 
 
 //SERVER COMMUNICATION
-var sendPlayer = function () {
+/*var sendPlayer = function () {
     fetch(`${url}/singularity/update`, {
         method: "POST",
         headers: {
@@ -361,11 +361,11 @@ var sendPlayer = function () {
             ringrotation: pRing.rotation
         })
     })
-}
+}*/
 
 var updateGame = function () {
-    updatePlayer();
-    sendPlayer();
+    //updatePlayer();
+    //sendPlayer();
     updatePlayers();
     //updateAsteroids();
     controls.target = pMesh.position;
