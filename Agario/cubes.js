@@ -364,7 +364,7 @@ var updateAsteroids = function () {
 }*/
 
 var updateGame = function () {
-    //updatePlayer();
+    updatePlayer();
     //sendPlayer();
     updatePlayers();
     //updateAsteroids();
