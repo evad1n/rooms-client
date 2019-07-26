@@ -296,6 +296,10 @@
                         </v-card>
                     </v-flex>
 
+                    <!-- GO -->
+                    <v-flex xs8 v-if="getRoomType(room) == 'go'">
+                    </v-flex>
+
                     <!-- SIDEBAR -->
                     <v-flex xs4 pt-0>
                         <v-card v-bind:color="secondaryColor">
@@ -316,6 +320,7 @@
 <script src="script.js"></script>
 <script src="games/pictionary.js"></script>
 <script src="games/tictactoe.js"></script>
+<script src="games/go.js"></script>
 <!-- <script src="games/singularity/three.js"></script>
 <script src="games/singularity/extensions/OrbitControls.js"></script>
 <script src="games/singularity/singularity.js"></script> -->
