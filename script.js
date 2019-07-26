@@ -1,5 +1,5 @@
-// const url = 'https://server-rooms.herokuapp.com'
-const url = 'http://localhost:3000'
+const url = 'https://server-rooms.herokuapp.com'
+// const url = 'http://localhost:3000'
 
 const UPDATE_INTERVAL = 200
 
