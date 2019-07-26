@@ -167,9 +167,9 @@ var pictionary = new Vue({
         secondsLeft: function() {
             if(app.roomData.drawing) {
                 var ms = new Date().getTime() - new Date(app.roomData.startTime).getTime()
-                return 5 - Math.max(Math.floor(ms / 1000), 0)
+                return 30 - Math.max(Math.floor(ms / 1000), 0)
             }
-            return 5
+            return 30
         }
     },
 })
