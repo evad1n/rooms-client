@@ -275,9 +275,7 @@ var updatePlayer = function () {
         devour(player);
     })
     asteroids.forEach(function (asteroid) {
-        asteroid.asteroids.forEach(function (rock) {
-            devour(rock);
-        })
+        devour(asteroid);
     })
 }
 
