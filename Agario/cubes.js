@@ -369,7 +369,7 @@ var updateGame = function () {
     updatePlayer();
     //sendPlayer();
     updatePlayers();
-    //updateAsteroids();
+    updateAsteroids();
     controls.target = pMesh.position;
     controls.update();
     //sendPlayer();
