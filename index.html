@@ -1,5 +1,3 @@
-<!-- https://evad1n.github.io/collector_blog_client/ -->
-
 <!DOCTYPE html>
 <html>
 
@@ -27,8 +25,6 @@
                 <v-spacer></v-spacer>
                 <v-toolbar-items class="display-1">
                     <v-btn text v-on:click="switchRoom('home')">HOME</v-btn>
-                    <div class="toolbar-divider"></div>
-                    <v-btn text v-on:click="switchRoom('home')">Singularity</v-btn>
                     <div class="toolbar-divider"></div>
                     <PrivateRoomCategory v-bind:title="'Messaging'" v-bind:type="'messages'"></PrivateRoomCategory>
                     <div class="toolbar-divider"></div>
@@ -105,11 +101,6 @@
                     </v-flex>
                     <v-flex xs3></v-flex>
                 </v-layout>
-            </v-container>
-
-            <!-- SINGULARITY -->
-            <v-container v-if="page == 'singularity'" grid-list-xl container--fluid>
-                <div id="blackhole"></div>
             </v-container>
 
             <!--GAMES-->
@@ -302,10 +293,6 @@
                         </v-card>
                     </v-flex>
 
-                    <!-- GO -->
-                    <v-flex xs8 v-if="getRoomType(room) == 'go'">
-                    </v-flex>
-
                     <!-- SIDEBAR -->
                     <v-flex xs4 pt-0>
                         <v-card v-bind:color="secondaryColor">
@@ -326,9 +313,5 @@
 <script src="script.js"></script>
 <script src="games/pictionary.js"></script>
 <script src="games/tictactoe.js"></script>
-<script src="games/go.js"></script>
-<!-- <script src="games/singularity/three.js"></script>
-<script src="games/singularity/extensions/OrbitControls.js"></script>
-<script src="games/singularity/singularity.js"></script> -->
 
 </html>
